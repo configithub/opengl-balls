@@ -1,0 +1,14 @@
+opengl-balls
+==========
+
+simple stuff based on opengl+sdl, contains a very simple entity component system
+
+mkdir bin
+
+make
+
+to execute, go in bin dir, then: 
+
+./app
+
+then press space

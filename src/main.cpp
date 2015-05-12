@@ -16,7 +16,7 @@ void manage_inputs() {
       running = false;
     if(events.type ==  SDL_KEYUP) 
       key_up(events.key.keysym.sym,events.key.keysym.mod,
-                                      events.key.keysym.unicode);
+                       events.key.keysym.unicode);
   }
 }
 

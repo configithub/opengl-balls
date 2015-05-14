@@ -11,6 +11,10 @@ void add_ball();
 
 void add_random_ball();
 
+void add_hard_ball();
+
+void add_random_hard_ball();
+
 void switch_mode();
 
 void init_entities();
@@ -24,8 +28,16 @@ extern int entity_nb;
 
 extern int mode;
 
-extern const int fixed_ball_spawn;
-extern const int random_ball_spawn;
-extern const int max_mode;
+extern const int speed_factor;
+extern const int size_factor;
+
+typedef enum {
+  FIXED_BALL_SPAWN = 0,
+  RANDOM_BALL_SPAWN,
+  FIXED_HARD_BALL_SPAWN,
+  RANDOM_HARD_BALL_SPAWN,
+  MAX_MODE
+} GAME_MODE;
+
 
 #endif

@@ -4,16 +4,17 @@
 
 #include "position.h"
 #include "rectangle.h"
+#include "aabb_collision.h"
 
 SDL_Event events;
 bool running;
 int entities[max_entity_nb];
 int entity_nb = 0;
 
-int mode = 0;
-const int fixed_ball_spawn = 0;
-const int random_ball_spawn = 1;
-const int max_mode = 2;
+const int speed_factor = 5;
+const int size_factor = 20;
+
+int mode = 3;
 
 
 void manage_inputs() {
@@ -30,10 +31,19 @@ void manage_inputs() {
 void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) { 
   switch(sym) {
     case SDLK_SPACE:
-      if(mode == fixed_ball_spawn) {
-        add_ball();
-      } else if(mode == random_ball_spawn) {
-        add_random_ball();
+      switch(mode) {
+        case FIXED_BALL_SPAWN:
+          add_ball();
+        break;
+        case RANDOM_BALL_SPAWN:
+          add_random_ball();
+        break;
+        case FIXED_HARD_BALL_SPAWN:
+          add_hard_ball();
+        break;
+        case RANDOM_HARD_BALL_SPAWN:
+          add_random_hard_ball();
+        break;
       }
     break;
     case SDLK_m:
@@ -49,10 +59,10 @@ void add_ball() {
   Rectangle& rect = rectangles[entity_nb];
   pos.x = 0;
   pos.y = 0;
-  speed.vx = 10;
-  speed.vy = 10;
-  rect.w = 5;
-  rect.h = 5;
+  speed.vx = speed_factor;
+  speed.vy = speed_factor;
+  rect.w = size_factor;
+  rect.h = size_factor;
   ++entity_nb;
 }
 
@@ -63,23 +73,57 @@ void add_random_ball() {
   Rectangle& rect = rectangles[entity_nb];
   pos.x = rand() % WWIDTH;
   pos.y = rand() % WHEIGHT;
-  speed.vx = rand() % 40 - 20;
-  speed.vy = rand() % 40 - 20;
-  rect.w = 5;
-  rect.h = 5;
+  speed.vx = rand() % 4*speed_factor - 2*speed_factor;
+  speed.vy = rand() % 4*speed_factor - 2*speed_factor;
+  rect.w = size_factor;
+  rect.h = size_factor;
+  ++entity_nb;
+}
+
+
+void add_hard_ball() {
+  Position& pos = positions[entity_nb];
+  Speed& speed = speeds[entity_nb];
+  Rectangle& rect = rectangles[entity_nb];
+  AABB& mask = aabbs[entity_nb];
+  pos.x = 0;
+  pos.y = 0;
+  speed.vx = speed_factor;
+  speed.vy = speed_factor;
+  rect.w = size_factor;
+  rect.h = size_factor;
+  mask.w = size_factor;
+  mask.h = size_factor;
+  ++entity_nb;
+}
+
+
+void add_random_hard_ball() {
+  Position& pos = positions[entity_nb];
+  Speed& speed = speeds[entity_nb];
+  Rectangle& rect = rectangles[entity_nb];
+  AABB& mask = aabbs[entity_nb];
+  pos.x = rand() % WWIDTH;
+  pos.y = rand() % WHEIGHT;
+  speed.vx = rand() % 4*speed_factor - 2*speed_factor;
+  speed.vy = rand() % 4*speed_factor - 2*speed_factor;
+  rect.w = size_factor;
+  rect.h = size_factor;
+  mask.w = size_factor;
+  mask.h = size_factor;
   ++entity_nb;
 }
 
 
 void switch_mode() {
   ++mode;
-  mode = mode % max_mode;
+  mode = mode % (int)MAX_MODE;
   printf("switch to mode : %d\n", mode);
 }
 
 
 void init_entities() {
-  add_ball();
+  // add_ball();
 }
 
 
@@ -90,6 +134,7 @@ void loop() {
     manage_inputs();
     for (int i = 0; i <= entity_nb; ++i) {
       update_position(i);
+      check_collision(i);
       render(i);
     }
     SDL_GL_SwapBuffers(); // refresh screen

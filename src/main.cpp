@@ -10,6 +10,12 @@ bool running;
 int entities[max_entity_nb];
 int entity_nb = 0;
 
+int mode = 0;
+const int fixed_ball_spawn = 0;
+const int random_ball_spawn = 1;
+const int max_mode = 2;
+
+
 void manage_inputs() {
   while(SDL_PollEvent(&events)) {
     if(events.type == SDL_QUIT)
@@ -24,7 +30,14 @@ void manage_inputs() {
 void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) { 
   switch(sym) {
     case SDLK_SPACE:
-      add_ball();
+      if(mode == fixed_ball_spawn) {
+        add_ball();
+      } else if(mode == random_ball_spawn) {
+        add_random_ball();
+      }
+    break;
+    case SDLK_m:
+      switch_mode();
     break;
   }
 }
@@ -42,6 +55,28 @@ void add_ball() {
   rect.h = 5;
   ++entity_nb;
 }
+
+
+void add_random_ball() {
+  Position& pos = positions[entity_nb];
+  Speed& speed = speeds[entity_nb];
+  Rectangle& rect = rectangles[entity_nb];
+  pos.x = rand() % WWIDTH;
+  pos.y = rand() % WHEIGHT;
+  speed.vx = rand() % 40 - 20;
+  speed.vy = rand() % 40 - 20;
+  rect.w = 5;
+  rect.h = 5;
+  ++entity_nb;
+}
+
+
+void switch_mode() {
+  ++mode;
+  mode = mode % max_mode;
+  printf("switch to mode : %d\n", mode);
+}
+
 
 void init_entities() {
   add_ball();

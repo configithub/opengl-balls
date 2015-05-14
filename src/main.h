@@ -31,6 +31,8 @@ extern int mode;
 extern const int speed_factor;
 extern const int size_factor;
 
+extern const int starting_entity_nb;
+
 typedef enum {
   FIXED_BALL_SPAWN = 0,
   RANDOM_BALL_SPAWN,

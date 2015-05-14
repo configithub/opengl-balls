@@ -11,8 +11,10 @@ bool running;
 int entities[max_entity_nb];
 int entity_nb = 0;
 
-const int speed_factor = 5;
+const int speed_factor = 2;
 const int size_factor = 20;
+
+const int starting_entity_nb = 15;
 
 int mode = 3;
 
@@ -123,7 +125,9 @@ void switch_mode() {
 
 
 void init_entities() {
-  // add_ball();
+  for (int i = 0; i < starting_entity_nb; i++) {
+    add_random_hard_ball();
+  }
 }
 
 

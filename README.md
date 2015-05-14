@@ -11,4 +11,4 @@ to execute, go in bin dir, then:
 
 ./app
 
-then press space
+then press space to do stuff and m to switch mode

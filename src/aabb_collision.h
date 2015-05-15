@@ -17,6 +17,8 @@ void check_collision(int entity);
 
 void do_collision(int entity, int other);
 
+void do_collision_repulse(int entity, int other);
+
 extern AABB aabbs[max_entity_nb];
 
 #endif

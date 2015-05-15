@@ -12,8 +12,11 @@ void update_position(int entity) {
   pos.y += speed.vy;
   if(pos.x <= 0 || pos.x >= WWIDTH-mask.w) {
     speed.vx *= -1;
+    // avoid area evasion bug at collisions 
+    pos.x = pos.x <= 0 ? 1 : WWIDTH-mask.w-1;
   }
   if(pos.y <= 0 || pos.y >= WHEIGHT-mask.h) {
     speed.vy *= -1;
+    pos.y = pos.y <= 0 ? 1 : WHEIGHT-mask.h-1;
   }
 }

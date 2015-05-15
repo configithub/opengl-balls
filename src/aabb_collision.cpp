@@ -67,15 +67,15 @@ void do_collision_repulse(int entity, int other) {
   int dx = x1 <= ox2 ? 1 : -1; 
   int dy = y1 <= oy2 ? 1 : -1;
   if(fabs(cx) < fabs(cy)) {
-    pos.x += dx;
-    opos.x -= dx;
-  }else if (fabs(cx) > fabs(cy)){
-    pos.y += dy;
-    opos.y -= dy;
-  }else{
-    pos.x += dx;
-    opos.x -= dx;
-    pos.y += dy;
-    opos.y -= dy;
-  }
+    pos.x += dx*fabs(speed.vx);
+    opos.x -= dx*fabs(ospeed.vx);;
+  }else{// if (fabs(cx) > fabs(cy)){
+    pos.y += dy*fabs(speed.vy);
+    opos.y -= dy*fabs(ospeed.vy);
+  }/*else{
+    pos.x += dx*fabs(speed.vx);
+    opos.x -= dx*fabs(ospeed.vx);;
+    pos.y += dy*fabs(speed.vy);
+    opos.y -= dy*fabs(ospeed.vy);
+  }*/
 }

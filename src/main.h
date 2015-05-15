@@ -23,6 +23,12 @@ void switch_mode();
 
 void init_entities();
 
+void update_positions();
+
+void do_collisions();
+
+void do_render();
+
 void loop();
 
 int main(int argc, char** argv);

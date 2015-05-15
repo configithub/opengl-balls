@@ -143,17 +143,38 @@ void init_entities() {
 }
 
 
+void update_positions() {
+  for (int i = 0; i <= entity_nb; ++i) {
+    Entity& entity = entities[i];
+    update_position(entity);
+  }
+}
+
+
+void do_collisions() {
+  for (int i = 0; i <= entity_nb; ++i) {
+    Entity& entity = entities[i];
+    check_collision(entity);
+  }
+}
+
+
+void do_render() {
+  for (int i = 0; i <= entity_nb; ++i) {
+    Entity& entity = entities[i];
+    render(entity);
+  }
+}
+
+
 void loop() {
   running = true;
   while(running) { 
     clear_screen();
     manage_inputs();
-    for (int i = 0; i <= entity_nb; ++i) {
-      Entity& entity = entities[i];
-      update_position(entity);
-      check_collision(entity);
-      render(entity);
-    }
+    update_positions();
+    do_collisions();
+    do_render();
     SDL_GL_SwapBuffers(); // refresh screen
   }
 }

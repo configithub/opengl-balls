@@ -1,6 +1,7 @@
 #ifndef _CONSTANSTS_H_
 #define _CONSTANSTS_H_
 
+#include <cstddef>
 
 #define WWIDTH 800
 #define WHEIGHT 600

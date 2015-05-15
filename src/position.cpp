@@ -1,13 +1,14 @@
 #include "position.h"
 #include "aabb_collision.h"
+#include "entity.h"
 
-Position positions[max_entity_nb];
-Speed speeds[max_entity_nb];
-
-void update_position(int entity) {
-  Position& pos = positions[entity];
-  Speed& speed = speeds[entity];
-  AABB& mask = aabbs[entity];
+void update_position(Entity& entity) {
+  if( entity.position == NULL 
+   || entity.speed == NULL
+   || entity.mask == NULL) { return; }
+  Position& pos = *(entity.position);
+  Speed& speed = *(entity.speed);
+  AABB& mask = *(entity.mask);
   pos.x += speed.vx;
   pos.y += speed.vy;
   if(pos.x <= 0 || pos.x >= WWIDTH-mask.w) {
@@ -19,4 +20,17 @@ void update_position(int entity) {
     speed.vy *= -1;
     pos.y = pos.y <= 0 ? 1 : WHEIGHT-mask.h-1;
   }
+}
+
+
+Position* PositionFactory::create() {
+  Position& pos = positions[nb_position];
+  ++nb_position;
+  return &pos;
+}
+
+Speed* SpeedFactory::create() {
+  Speed& pos = speeds[nb_speed];
+  ++nb_speed;
+  return &pos;
 }

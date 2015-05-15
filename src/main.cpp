@@ -2,13 +2,11 @@
 #include <stdio.h>
 #include "render_tools.h"
 
-#include "position.h"
-#include "rectangle.h"
-#include "aabb_collision.h"
+#include "entity.h"
 
 SDL_Event events;
 bool running;
-int entities[max_entity_nb];
+Entity entities[max_entity_nb];
 int entity_nb = 0;
 
 const int speed_factor = 2;
@@ -17,6 +15,12 @@ const int size_factor = 20;
 const int starting_entity_nb = 15;
 
 int mode = 3;
+
+// component factories
+PositionFactory position_factory;
+SpeedFactory speed_factory;
+RectangleFactory shape_factory;
+AABBFactory mask_factory;
 
 
 void manage_inputs() {
@@ -56,63 +60,71 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
 
 
 void add_ball() {
-  Position& pos = positions[entity_nb];
-  Speed& speed = speeds[entity_nb];
-  Rectangle& rect = rectangles[entity_nb];
-  pos.x = 0;
-  pos.y = 0;
-  speed.vx = speed_factor;
-  speed.vy = speed_factor;
-  rect.w = size_factor;
-  rect.h = size_factor;
+  Entity& entity = entities[entity_nb];
+  entity.id = entity_nb;
+  entity.position = position_factory.create();
+  entity.speed = speed_factory.create();
+  entity.shape = shape_factory.create();
+  entity.position->x = 0;
+  entity.position->y = 0;
+  entity.speed->vx = speed_factor;
+  entity.speed->vy = speed_factor;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
   ++entity_nb;
 }
 
 
 void add_random_ball() {
-  Position& pos = positions[entity_nb];
-  Speed& speed = speeds[entity_nb];
-  Rectangle& rect = rectangles[entity_nb];
-  pos.x = rand() % WWIDTH;
-  pos.y = rand() % WHEIGHT;
-  speed.vx = rand() % 4*speed_factor - 2*speed_factor;
-  speed.vy = rand() % 4*speed_factor - 2*speed_factor;
-  rect.w = size_factor;
-  rect.h = size_factor;
+  Entity& entity = entities[entity_nb];
+  entity.id = entity_nb;
+  entity.position = position_factory.create();
+  entity.speed = speed_factory.create();
+  entity.shape = shape_factory.create();
+  entity.position->x = rand() % WWIDTH;
+  entity.position->y = rand() % WHEIGHT;
+  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
   ++entity_nb;
 }
 
 
 void add_hard_ball() {
-  Position& pos = positions[entity_nb];
-  Speed& speed = speeds[entity_nb];
-  Rectangle& rect = rectangles[entity_nb];
-  AABB& mask = aabbs[entity_nb];
-  pos.x = 0;
-  pos.y = 0;
-  speed.vx = speed_factor;
-  speed.vy = speed_factor;
-  rect.w = size_factor;
-  rect.h = size_factor;
-  mask.w = size_factor;
-  mask.h = size_factor;
+  Entity& entity = entities[entity_nb];
+  entity.id = entity_nb;
+  entity.position = position_factory.create();
+  entity.speed = speed_factory.create();
+  entity.shape = shape_factory.create();
+  entity.mask = mask_factory.create();
+  entity.position->x = 0;
+  entity.position->y = 0;
+  entity.speed->vx = speed_factor;
+  entity.speed->vy = speed_factor;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
   ++entity_nb;
 }
 
 
 void add_random_hard_ball() {
-  Position& pos = positions[entity_nb];
-  Speed& speed = speeds[entity_nb];
-  Rectangle& rect = rectangles[entity_nb];
-  AABB& mask = aabbs[entity_nb];
-  pos.x = rand() % WWIDTH;
-  pos.y = rand() % WHEIGHT;
-  speed.vx = rand() % 4*speed_factor - 2*speed_factor;
-  speed.vy = rand() % 4*speed_factor - 2*speed_factor;
-  rect.w = size_factor;
-  rect.h = size_factor;
-  mask.w = size_factor;
-  mask.h = size_factor;
+  Entity& entity = entities[entity_nb];
+  entity.id = entity_nb;
+  entity.position = position_factory.create();
+  entity.speed = speed_factory.create();
+  entity.shape = shape_factory.create();
+  entity.mask = mask_factory.create();
+  entity.position->x = rand() % WWIDTH;
+  entity.position->y = rand() % WHEIGHT;
+  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
   ++entity_nb;
 }
 
@@ -137,9 +149,10 @@ void loop() {
     clear_screen();
     manage_inputs();
     for (int i = 0; i <= entity_nb; ++i) {
-      update_position(i);
-      check_collision(i);
-      render(i);
+      Entity& entity = entities[i];
+      update_position(entity);
+      check_collision(entity);
+      render(entity);
     }
     SDL_GL_SwapBuffers(); // refresh screen
   }

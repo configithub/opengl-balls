@@ -69,13 +69,8 @@ void do_collision_repulse(int entity, int other) {
   if(fabs(cx) < fabs(cy)) {
     pos.x += dx*fabs(speed.vx);
     opos.x -= dx*fabs(ospeed.vx);;
-  }else{// if (fabs(cx) > fabs(cy)){
+  }else{
     pos.y += dy*fabs(speed.vy);
     opos.y -= dy*fabs(ospeed.vy);
-  }/*else{
-    pos.x += dx*fabs(speed.vx);
-    opos.x -= dx*fabs(ospeed.vx);;
-    pos.y += dy*fabs(speed.vy);
-    opos.y -= dy*fabs(ospeed.vy);
-  }*/
+  }
 }

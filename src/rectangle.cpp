@@ -10,10 +10,11 @@ void render(Entity& entity) {
     || entity.shape == NULL) { return; }
   Position& pos = *(entity.position);
   Rectangle& rect = *(entity.shape);
-  draw_hollow_square(pos.x, pos.y,
-                     pos.x+rect.w, pos.y,
-                     pos.x+rect.w, pos.y+rect.h,
-                     pos.x, pos.y+rect.h);
+  int w = rect.w/2; int h = rect.h/2;
+  draw_hollow_square(pos.x-w, pos.y-h,
+                     pos.x+w, pos.y-h,
+                     pos.x+w, pos.y+h,
+                     pos.x-w, pos.y+h);
 }
 
 

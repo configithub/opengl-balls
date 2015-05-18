@@ -14,8 +14,9 @@ void check_collision(Entity& entity) {
   Position& pos = *(entity.position);
   AABB& mask = *(entity.mask);
   if(mask.w == 0 && mask.h == 0) { return; } // ghost object
-  int x1 = pos.x; int y1 = pos.y;
-  int x2 = pos.x+mask.w; int y2 = pos.y+mask.h;
+  int w = mask.w/2; int h = mask.h/2;
+  int x1 = pos.x-w; int y1 = pos.y-h;
+  int x2 = pos.x+w; int y2 = pos.y+h;
   for(int i= 0; i < entity_nb; ++i) {
     Entity& other = entities[i];
     if(other.id <= entity.id) { continue; } // prevent self and double collision
@@ -23,8 +24,9 @@ void check_collision(Entity& entity) {
       || other.mask == NULL) { continue; }
     Position& opos = *(other.position);
     AABB& omask = *(other.mask);
-    int ox1 = opos.x; int oy1 = opos.y;
-    int ox2 = opos.x+omask.w; int oy2 = opos.y+omask.h;
+    int ow = omask.w/2; int oh = omask.h/2;
+    int ox1 = opos.x-ow; int oy1 = opos.y-oh;
+    int ox2 = opos.x+ow; int oy2 = opos.y+oh;
     if( ox2 < x1 || x2 < ox1 || oy2 < y1 || y2 < oy1 ) {
       continue; // no collision
     }else{ // collision happens
@@ -60,12 +62,14 @@ void do_collision_repulse(Entity& entity, Entity& other) {
   // repulsion to avoid interlock
   Position& pos = *(entity.position);
   AABB& mask = *(entity.mask);
-  int x1 = pos.x; int y1 = pos.y;
-  int x2 = pos.x+mask.w; int y2 = pos.y+mask.h;
+  int w = mask.w/2; int h = mask.h/2;
+  int x1 = pos.x-w; int y1 = pos.y-h;
+  int x2 = pos.x+w; int y2 = pos.y+h;
   Position& opos = *(other.position);
   AABB& omask = *(other.mask);
-  int ox1 = opos.x; int oy1 = opos.y;
-  int ox2 = opos.x+omask.w; int oy2 = opos.y+omask.h;
+  int ow = omask.w/2; int oh = omask.h/2;
+  int ox1 = opos.x-ow; int oy1 = opos.y-oh;
+  int ox2 = opos.x+ow; int oy2 = opos.y+oh;
   // collision depth, can be negative depending on relative positions
   int cx = x1 <= ox2 ? (ox2 - x1) : (x2 - ox1); 
   int cy = y1 <= oy2 ? (oy2 - y1) : (y2 - oy1);

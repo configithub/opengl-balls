@@ -12,7 +12,7 @@ int entity_nb = 0;
 const int speed_factor = 2;
 const int size_factor = 20;
 
-const int starting_entity_nb = 15;
+const int starting_entity_nb = 20;
 
 int mode = 3;
 

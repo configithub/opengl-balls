@@ -7,6 +7,7 @@ class Speed;
 class Rectangle;
 class AABB;
 class Angle;
+class AngularSpeed;
 
 class Entity {
 public:
@@ -15,6 +16,7 @@ public:
   Rectangle* shape;
   AABB* mask;
   Angle* angle;
+  AngularSpeed* ang_speed;
 
   int id;
 
@@ -23,7 +25,8 @@ public:
             speed(NULL),
             shape(NULL),
             mask(NULL),
-            angle(NULL) {};
+            angle(NULL),
+            ang_speed(NULL) {};
 
 };
 

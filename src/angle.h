@@ -9,4 +9,10 @@ public:
   Angle(): theta(0.0) {}
 };
 
+class AngularSpeed : public Component {
+public:
+  float omega;
+  AngularSpeed(): omega(0.0) {}
+};
+
 #endif

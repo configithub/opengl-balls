@@ -21,6 +21,7 @@ public:
 
 
 void update_position(Entity& entity);
+void update_position_angular(Entity& entity);
 
 
 #endif

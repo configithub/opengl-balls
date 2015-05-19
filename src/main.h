@@ -23,6 +23,8 @@ void add_random_hard_ball();
 
 void add_random_rotated_ball();
 
+void add_random_rotating_ball();
+
 void switch_mode();
 
 void init_entities();
@@ -53,6 +55,7 @@ typedef enum {
   FIXED_HARD_BALL_SPAWN,
   RANDOM_HARD_BALL_SPAWN,
   RANDOM_ROTATED_BALL_SPAWN,
+  RANDOM_ROTATING_BALL_SPAWN,
   MAX_MODE
 } GAME_MODE;
 
@@ -63,6 +66,7 @@ extern ComponentFactory<Speed> speed_factory;
 extern ComponentFactory<Rectangle> shape_factory;
 extern ComponentFactory<AABB> mask_factory;
 extern ComponentFactory<Angle> angle_factory;
+extern ComponentFactory<AngularSpeed> ang_speed_factory;
 
 
 #endif

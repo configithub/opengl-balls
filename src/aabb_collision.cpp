@@ -86,8 +86,3 @@ void do_collision_repulse(Entity& entity, Entity& other) {
 }
 
 
-AABB* AABBFactory::create() {
-  AABB& mask = aabbs[nb_aabb];
-  ++nb_aabb;
-  return &mask;
-}

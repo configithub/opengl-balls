@@ -23,14 +23,3 @@ void update_position(Entity& entity) {
 }
 
 
-Position* PositionFactory::create() {
-  Position& pos = positions[nb_position];
-  ++nb_position;
-  return &pos;
-}
-
-Speed* SpeedFactory::create() {
-  Speed& pos = speeds[nb_speed];
-  ++nb_speed;
-  return &pos;
-}

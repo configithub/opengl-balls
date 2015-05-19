@@ -1,7 +1,10 @@
 #include "rectangle.h"
 #include "render_tools.h"
 #include "position.h"
+#include "angle.h"
 #include "entity.h"
+
+#include <math.h>
 
 Rectangle rectangles[max_entity_nb];
 
@@ -17,9 +20,24 @@ void render(Entity& entity) {
                      pos.x-w, pos.y+h);
 }
 
-
-Rectangle* RectangleFactory::create() {
-  Rectangle& rect = rectangles[nb_rectangle];
-  ++nb_rectangle;
-  return &rect;
+void render_rotated(Entity& entity) {
+  if ( entity.angle == NULL ) { render(entity); return; }
+  if ( entity.position == NULL 
+    || entity.shape == NULL) { return; }
+  Position& pos = *(entity.position);
+  Rectangle& rect = *(entity.shape);
+  Angle& angle = *(entity.angle);
+  int w = rect.w/2; int h = rect.h/2;
+  float cos_theta = cos(angle.theta);
+  float sin_theta = sin(angle.theta);
+  int w_r_a = (int) (w*cos_theta + h*sin_theta);
+  int h_r_a = (int) (-w*sin_theta + h*cos_theta);
+  int w_r_b = (int) (-w*cos_theta + h*sin_theta);
+  int h_r_b = (int) (w*sin_theta + h*cos_theta);
+  draw_hollow_square(pos.x-w_r_a, pos.y-h_r_a,
+                     pos.x-w_r_b, pos.y-h_r_b,
+                     pos.x+w_r_a, pos.y+h_r_a,
+                     pos.x+w_r_b, pos.y+h_r_b);
 }
+
+

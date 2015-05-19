@@ -13,14 +13,7 @@ public:
 };
 
 void render(Entity& entity);
+void render_rotated(Entity& entity);
 
-class RectangleFactory {
-public:
-  RectangleFactory(): nb_rectangle(0) {}
-  Rectangle* create();
-private:
-  int nb_rectangle;
-  Rectangle rectangles[max_entity_nb];
-};
 
 #endif

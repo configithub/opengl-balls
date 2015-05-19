@@ -22,13 +22,5 @@ void do_collision(Entity& entity, Entity& other);
 
 void do_collision_repulse(Entity& entity, Entity& other);
 
-class AABBFactory {
-public:
-  AABBFactory(): nb_aabb(0) {}
-  AABB* create();
-private:
-  int nb_aabb;
-  AABB aabbs[max_entity_nb];
-};
 
 #endif

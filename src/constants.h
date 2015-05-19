@@ -8,6 +8,7 @@
 #define BPP_DEPTH 16
 #define max_entity_nb 100
 
+#define PI 3.14159265
 
 
 #endif

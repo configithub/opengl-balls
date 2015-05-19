@@ -6,6 +6,7 @@ class Position;
 class Speed;
 class Rectangle;
 class AABB;
+class Angle;
 
 class Entity {
 public:
@@ -13,6 +14,7 @@ public:
   Speed* speed;
   Rectangle* shape;
   AABB* mask;
+  Angle* angle;
 
   int id;
 
@@ -20,7 +22,8 @@ public:
   Entity(): id(0), position(NULL), 
             speed(NULL),
             shape(NULL),
-            mask(NULL) {};
+            mask(NULL),
+            angle(NULL) {};
 
 };
 

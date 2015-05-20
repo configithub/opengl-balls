@@ -20,8 +20,6 @@ ComponentFactory<Position> position_factory;
 ComponentFactory<Speed> speed_factory;
 ComponentFactory<Rectangle> shape_factory;
 ComponentFactory<AABB> mask_factory;
-ComponentFactory<Angle> angle_factory;
-ComponentFactory<AngularSpeed> ang_speed_factory;
 
 
 void manage_inputs() {
@@ -143,7 +141,6 @@ void add_random_rotated_ball() {
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
   entity.mask = mask_factory.create();
-  entity.angle = angle_factory.create();
   entity.position->x = rand() % WWIDTH;
   entity.position->y = rand() % WHEIGHT;
   entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
@@ -152,7 +149,7 @@ void add_random_rotated_ball() {
   entity.shape->h = size_factor;
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
-  entity.angle->theta = 2 * PI * (float) (rand() % 100) / 100;
+  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
   ++entity_nb;
 }
 
@@ -164,8 +161,6 @@ void add_random_rotating_ball() {
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
   entity.mask = mask_factory.create();
-  entity.angle = angle_factory.create();
-  entity.ang_speed = ang_speed_factory.create();
   entity.position->x = rand() % WWIDTH;
   entity.position->y = rand() % WHEIGHT;
   entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
@@ -174,8 +169,8 @@ void add_random_rotating_ball() {
   entity.shape->h = size_factor;
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
-  entity.angle->theta = 2 * PI * (float) (rand() % 100) / 100;
-  entity.ang_speed->omega = 2 * PI * (float) (rand() % 5) / 100;
+  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
+  entity.speed->omega = PI *( (float) (rand() % 20) / 250);
   ++entity_nb;
 }
 

@@ -1,7 +1,6 @@
 #include "rectangle.h"
 #include "render_tools.h"
 #include "position.h"
-#include "angle.h"
 #include "entity.h"
 
 #include <math.h>
@@ -21,15 +20,14 @@ void render(Entity& entity) {
 }
 
 void render_rotated(Entity& entity) {
-  if ( entity.angle == NULL ) { render(entity); return; }
   if ( entity.position == NULL 
     || entity.shape == NULL) { return; }
+  if ( entity.position->theta == 0 ) { render(entity); return; }
   Position& pos = *(entity.position);
   Rectangle& rect = *(entity.shape);
-  Angle& angle = *(entity.angle);
   int w = rect.w/2; int h = rect.h/2;
-  float cos_theta = cos(angle.theta);
-  float sin_theta = sin(angle.theta);
+  float cos_theta = cos(pos.theta);
+  float sin_theta = sin(pos.theta);
   int w_r_a = (int) (w*cos_theta + h*sin_theta);
   int h_r_a = (int) (-w*sin_theta + h*cos_theta);
   int w_r_b = (int) (-w*cos_theta + h*sin_theta);

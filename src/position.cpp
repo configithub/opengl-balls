@@ -1,7 +1,7 @@
 #include "position.h"
 #include "aabb_collision.h"
 #include "entity.h"
-#include "angle.h"
+#include "constants.h"
 
 void update_position(Entity& entity) {
   if( entity.position == NULL 
@@ -25,11 +25,6 @@ void update_position(Entity& entity) {
 
 
 void update_position_angular(Entity& entity) {
-  if( entity.ang_speed == NULL 
-   || entity.angle == NULL) {
-    update_position(entity);
-    return;
-  }
   if( entity.position == NULL 
    || entity.speed == NULL
    || entity.mask == NULL) { return; }
@@ -48,8 +43,7 @@ void update_position_angular(Entity& entity) {
     pos.y = pos.y <= mask.h/2 ? mask.h/2+1 : WHEIGHT-mask.h/2-1;
   }
   // update rotation angle
-  AngularSpeed& ang_speed = *(entity.ang_speed);
-  Angle& angle = *(entity.angle);
-  angle.theta += ang_speed.omega;
+  pos.theta += speed.omega;
+  pos.theta = pos.theta > 2*PI ? pos.theta - 2*PI : pos.theta;
 
 }

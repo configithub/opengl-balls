@@ -8,7 +8,6 @@
 #include "position.h"
 #include "rectangle.h"
 #include "aabb_collision.h"
-#include "angle.h"
 
 void manage_inputs();
 void key_up(SDLKey sym, SDLMod mod, Uint16 unicode);
@@ -65,8 +64,6 @@ extern ComponentFactory<Position> position_factory;
 extern ComponentFactory<Speed> speed_factory;
 extern ComponentFactory<Rectangle> shape_factory;
 extern ComponentFactory<AABB> mask_factory;
-extern ComponentFactory<Angle> angle_factory;
-extern ComponentFactory<AngularSpeed> ang_speed_factory;
 
 
 #endif

@@ -9,6 +9,7 @@ AABB aabbs[max_entity_nb];
 
 
 void check_collision(Entity& entity) {
+  if(entity.flags & GHOST) { return; }
   if ( entity.position == NULL 
     || entity.mask == NULL) { return; }
   Position& pos = *(entity.position);

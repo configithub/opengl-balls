@@ -8,8 +8,8 @@ bool running;
 Entity entities[max_entity_nb];
 int entity_nb = 0;
 
-const int speed_factor = 15;
-const int size_factor = 40;
+const int speed_factor = 4;
+const int size_factor = 20;
 
 const int starting_entity_nb = 15;
 
@@ -64,6 +64,9 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_m:
       switch_mode();
     break;
+    case SDLK_r:
+      respawn();
+    break;
   }
 }
 
@@ -74,12 +77,16 @@ void add_ball() {
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
+  entity.mask = mask_factory.create();
   entity.position->x = 0;
   entity.position->y = 0;
   entity.speed->vx = speed_factor;
   entity.speed->vy = speed_factor;
   entity.shape->w = size_factor;
   entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
+  entity.flags = GHOST;
   ++entity_nb;
 }
 
@@ -90,12 +97,16 @@ void add_random_ball() {
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
+  entity.mask = mask_factory.create();
   entity.position->x = rand() % WWIDTH;
   entity.position->y = rand() % WHEIGHT;
   entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
   entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
   entity.shape->w = size_factor;
   entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
+  entity.flags = GHOST;
   ++entity_nb;
 }
 
@@ -212,9 +223,40 @@ void switch_mode() {
 
 void init_entities() {
   for (int i = 0; i < starting_entity_nb; i++) {
-    add_falling_ball();
-    //add_random_rotating_ball();
+    switch(mode) {
+      case FIXED_BALL_SPAWN:
+        add_ball();
+      break;
+      case RANDOM_BALL_SPAWN:
+        add_random_ball();
+      break;
+      case FIXED_HARD_BALL_SPAWN:
+        add_hard_ball();
+      break;
+      case RANDOM_HARD_BALL_SPAWN:
+        add_random_hard_ball();
+      break;
+      case RANDOM_ROTATED_BALL_SPAWN:
+        add_random_rotated_ball();
+      break;
+      case RANDOM_ROTATING_BALL_SPAWN:
+        add_random_rotating_ball();
+      break;
+      case RANDOM_FALLING_BALL_SPAWN:
+        add_falling_ball();
+      break;
+    }
   }
+}
+
+
+void respawn() {
+  for (int i = 0; i <= entity_nb; ++i) {
+    Entity& entity = entities[i];
+    entity = Entity();
+  }
+  entity_nb = 0;
+  init_entities();
 }
 
 

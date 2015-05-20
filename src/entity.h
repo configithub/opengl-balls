@@ -9,9 +9,8 @@ class AABB;
 class Accel;
 
 typedef enum {
-  GRAVITY_BOUND = 1 << 0,
-  // INELASTIC_REBOUND = 2 << 0,
-  MAX_FLAG
+  GHOST = 1 << 0,
+  GRAVITY_BOUND = 2 << 0,
 } EN_Flag;
 
 class Entity {

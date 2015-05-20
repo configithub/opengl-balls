@@ -30,6 +30,8 @@ void switch_mode();
 
 void init_entities();
 
+void respawn();
+
 void apply_gravity();
 
 void update_positions();

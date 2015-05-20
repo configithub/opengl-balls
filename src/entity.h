@@ -6,8 +6,13 @@ class Position;
 class Speed;
 class Rectangle;
 class AABB;
-class Angle;
-class AngularSpeed;
+class Accel;
+
+typedef enum {
+  GRAVITY_BOUND = 1 << 0,
+  // INELASTIC_REBOUND = 2 << 0,
+  MAX_FLAG
+} EN_Flag;
 
 class Entity {
 public:
@@ -15,18 +20,18 @@ public:
   Speed* speed;
   Rectangle* shape;
   AABB* mask;
-  Angle* angle;
-  AngularSpeed* ang_speed;
+  Accel* accel;
 
   int id;
+  int flags; // bitset
 
   // init all components to null
   Entity(): id(0), position(NULL), 
             speed(NULL),
             shape(NULL),
             mask(NULL),
-            angle(NULL),
-            ang_speed(NULL) {};
+            accel(NULL), 
+            flags(0) {};
 
 };
 

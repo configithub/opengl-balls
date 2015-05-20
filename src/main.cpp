@@ -8,18 +8,19 @@ bool running;
 Entity entities[max_entity_nb];
 int entity_nb = 0;
 
-const int speed_factor = 2;
-const int size_factor = 20;
+const int speed_factor = 15;
+const int size_factor = 40;
 
-const int starting_entity_nb = 20;
+const int starting_entity_nb = 15;
 
-int mode = 5; // RANDOM_ROTATING_BALL_SPAWN
+int mode = 6; // RANDOM_FALLING_BALL_SPAWN
 
 // component factories
 ComponentFactory<Position> position_factory;
 ComponentFactory<Speed> speed_factory;
 ComponentFactory<Rectangle> shape_factory;
 ComponentFactory<AABB> mask_factory;
+ComponentFactory<Accel> accel_factory;
 
 
 void manage_inputs() {
@@ -54,6 +55,9 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
         break;
         case RANDOM_ROTATING_BALL_SPAWN:
           add_random_rotating_ball();
+        break;
+        case RANDOM_FALLING_BALL_SPAWN:
+          add_falling_ball();
         break;
       }
     break;
@@ -175,6 +179,30 @@ void add_random_rotating_ball() {
 }
 
 
+void add_falling_ball() {
+  Entity& entity = entities[entity_nb];
+  entity.id = entity_nb;
+  entity.position = position_factory.create();
+  entity.speed = speed_factory.create();
+  entity.shape = shape_factory.create();
+  entity.mask = mask_factory.create();
+  entity.accel = accel_factory.create();
+  entity.position->x = rand() % WWIDTH;
+  entity.position->y = rand() % WHEIGHT;
+  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
+  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
+  entity.speed->omega = PI *( (float) (rand() % 20) / 250);
+  entity.flags = GRAVITY_BOUND;
+  entity.accel->friction = 1;
+  ++entity_nb;
+}
+
+
 void switch_mode() {
   ++mode;
   mode = mode % (int)MAX_MODE;
@@ -184,7 +212,17 @@ void switch_mode() {
 
 void init_entities() {
   for (int i = 0; i < starting_entity_nb; i++) {
-    add_random_rotating_ball();
+    add_falling_ball();
+    //add_random_rotating_ball();
+  }
+}
+
+
+void apply_gravity() {
+  for (int i = 0; i <= entity_nb; ++i) {
+    Entity& entity = entities[i];
+    if(entity.accel == NULL) { continue; }
+    entity.accel->ay = entity.flags & GRAVITY_BOUND ? 2 : 0;
   }
 }
 
@@ -192,7 +230,7 @@ void init_entities() {
 void update_positions() {
   for (int i = 0; i <= entity_nb; ++i) {
     Entity& entity = entities[i];
-    update_position_angular(entity);
+    update_position_inertial(entity);
   }
 }
 
@@ -218,6 +256,7 @@ void loop() {
   while(running) { 
     clear_screen();
     manage_inputs();
+    apply_gravity();
     update_positions();
     do_collisions();
     do_render();

@@ -28,10 +28,10 @@ void render_rotated(Entity& entity) {
   int w = rect.w/2; int h = rect.h/2;
   float cos_theta = cos(pos.theta);
   float sin_theta = sin(pos.theta);
-  int w_r_a = (int) (w*cos_theta + h*sin_theta);
-  int h_r_a = (int) (-w*sin_theta + h*cos_theta);
-  int w_r_b = (int) (-w*cos_theta + h*sin_theta);
-  int h_r_b = (int) (w*sin_theta + h*cos_theta);
+  int w_r_a = (int) (w*cos_theta + h*sin_theta + 0.5);
+  int h_r_a = (int) (-w*sin_theta + h*cos_theta + 0.5);
+  int w_r_b = (int) (-w*cos_theta + h*sin_theta + 0.5);
+  int h_r_b = (int) (w*sin_theta + h*cos_theta + 0.5);
   draw_hollow_square(pos.x-w_r_a, pos.y-h_r_a,
                      pos.x-w_r_b, pos.y-h_r_b,
                      pos.x+w_r_a, pos.y+h_r_a,

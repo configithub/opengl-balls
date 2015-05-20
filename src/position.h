@@ -24,8 +24,19 @@ public:
 };
 
 
+class Accel : public Component {
+public:
+  int ax;
+  int ay;
+  int friction; // for inelastic rebound
+  Accel() : ax(0), ay(0), friction(0) {}
+};
+
+
+int sgn(int val); // helper function to get the sign of an int
 void update_position(Entity& entity);
 void update_position_angular(Entity& entity);
+void update_position_inertial(Entity& entity);
 
 
 #endif

@@ -24,9 +24,13 @@ void add_random_rotated_ball();
 
 void add_random_rotating_ball();
 
+void add_falling_ball();
+
 void switch_mode();
 
 void init_entities();
+
+void apply_gravity();
 
 void update_positions();
 
@@ -55,6 +59,7 @@ typedef enum {
   RANDOM_HARD_BALL_SPAWN,
   RANDOM_ROTATED_BALL_SPAWN,
   RANDOM_ROTATING_BALL_SPAWN,
+  RANDOM_FALLING_BALL_SPAWN,
   MAX_MODE
 } GAME_MODE;
 
@@ -64,6 +69,7 @@ extern ComponentFactory<Position> position_factory;
 extern ComponentFactory<Speed> speed_factory;
 extern ComponentFactory<Rectangle> shape_factory;
 extern ComponentFactory<AABB> mask_factory;
+extern ComponentFactory<Accel> accel_factory;
 
 
 #endif

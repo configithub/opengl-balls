@@ -22,7 +22,5 @@ void do_collision(Entity& entity, Entity& other);
 
 void do_collision_repulse(Entity& entity, Entity& other);
 
-void do_collision_inelastic(Entity& entity, Entity& other);
-
 
 #endif

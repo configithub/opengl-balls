@@ -1,6 +1,5 @@
 #include "rectangle.h"
 #include "render_tools.h"
-#include "position.h"
 #include "entity.h"
 
 #include <math.h>

@@ -10,6 +10,7 @@ class Rectangle : public Component {
 public:
   int w;
   int h;
+  Rectangle(): w(0), h(0) {}
 };
 
 void render(Entity& entity);

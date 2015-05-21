@@ -1,13 +1,9 @@
 #ifndef _main_H_
 #define _main_H_
 
+#include "entity.h"
 #include "constants.h"
 #include "render_tools.h"
-
-#include "component.h"
-#include "position.h"
-#include "rectangle.h"
-#include "aabb_collision.h"
 
 void manage_inputs();
 void key_up(SDLKey sym, SDLMod mod, Uint16 unicode);
@@ -66,12 +62,6 @@ typedef enum {
 } GAME_MODE;
 
 
-// component factories
-extern ComponentFactory<Position> position_factory;
-extern ComponentFactory<Speed> speed_factory;
-extern ComponentFactory<Rectangle> shape_factory;
-extern ComponentFactory<AABB> mask_factory;
-extern ComponentFactory<Accel> accel_factory;
 
 
 #endif

@@ -1,7 +1,5 @@
 #include "main.h"
 #include <stdio.h>
-#include "render_tools.h"
-#include "entity.h"
 
 SDL_Event events;
 bool running;
@@ -15,12 +13,6 @@ const int starting_entity_nb = 15;
 
 int mode = 6; // RANDOM_FALLING_BALL_SPAWN
 
-// component factories
-ComponentFactory<Position> position_factory;
-ComponentFactory<Speed> speed_factory;
-ComponentFactory<Rectangle> shape_factory;
-ComponentFactory<AABB> mask_factory;
-ComponentFactory<Accel> accel_factory;
 
 
 void manage_inputs() {
@@ -253,7 +245,7 @@ void init_entities() {
 void respawn() {
   for (int i = 0; i <= entity_nb; ++i) {
     Entity& entity = entities[i];
-    entity = Entity();
+    entity.remove();
   }
   entity_nb = 0;
   init_entities();

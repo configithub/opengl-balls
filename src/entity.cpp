@@ -10,6 +10,7 @@ ComponentFactory<Accel> accel_factory;
 ComponentFactory<Rectangle> shape_factory;
 ComponentFactory<AABB> mask_factory;
 
+int EntityFactory::next_id = 0;
 
 void Entity::remove() {
   flags = DEAD;
@@ -39,7 +40,9 @@ void Entity::remove() {
 Entity& EntityFactory::create() {
   Entity& entity = entities[nb_entity];
   entity = Entity();
-  entity.id = nb_entity;
+  entity.id = next_id;
+  printf("adding entity : %d\n", entity.id);
+  ++next_id;
   ++nb_entity;
   return entity;
 }
@@ -47,7 +50,7 @@ Entity& EntityFactory::create() {
 
 void EntityFactory::remove(Entity& entity) {
   if(nb_entity <= 0) { return; }
-  entity.remove();
+  printf("removing entity : %d\n", entity.id);
   entity = entities[nb_entity-1];
   --nb_entity;
 }

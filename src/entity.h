@@ -58,6 +58,8 @@ public:
   Entity entities[max_entity_nb];
   int nb_entity;
 
+  static int next_id;
+
 };
 
 

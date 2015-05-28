@@ -51,6 +51,7 @@ Entity& EntityFactory::create() {
 void EntityFactory::remove(Entity& entity) {
   if(nb_entity <= 0) { return; }
   printf("removing entity : %d\n", entity.id);
+  entity.remove();
   entity = entities[nb_entity-1];
   --nb_entity;
 }

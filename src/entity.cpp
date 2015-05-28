@@ -1,6 +1,8 @@
 #include "entity.h"
+#include <stdio.h>
 
 
+EntityFactory entity_factory;
 // component factories
 ComponentFactory<Position> position_factory;
 ComponentFactory<Speed> speed_factory;
@@ -10,7 +12,7 @@ ComponentFactory<AABB> mask_factory;
 
 
 void Entity::remove() {
-  flags = 0;
+  flags = DEAD;
   if(position != NULL) {
     position_factory.remove(position);
     position = NULL;
@@ -32,3 +34,25 @@ void Entity::remove() {
     mask = NULL;
   }
 }
+
+
+Entity& EntityFactory::create() {
+  Entity& entity = entities[nb_entity];
+  entity = Entity();
+  entity.id = nb_entity;
+  ++nb_entity;
+  return entity;
+}
+
+
+void EntityFactory::remove(Entity& entity) {
+  if(nb_entity <= 0) { return; }
+  entity.remove();
+  entity = entities[nb_entity-1];
+  --nb_entity;
+}
+
+
+
+
+

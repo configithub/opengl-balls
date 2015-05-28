@@ -6,6 +6,7 @@
 #include "render_tools.h"
 
 void manage_inputs();
+
 void key_up(SDLKey sym, SDLMod mod, Uint16 unicode);
 
 void add_ball();
@@ -21,6 +22,8 @@ void add_random_rotated_ball();
 void add_random_rotating_ball();
 
 void add_falling_ball();
+
+void remove_random_ball();
 
 void switch_mode();
 
@@ -40,9 +43,6 @@ void loop();
 
 int main(int argc, char** argv);
 
-extern Entity entities[max_entity_nb];
-extern int entity_nb;
-
 extern int mode;
 
 extern const int speed_factor;
@@ -60,8 +60,6 @@ typedef enum {
   RANDOM_FALLING_BALL_SPAWN,
   MAX_MODE
 } GAME_MODE;
-
-
 
 
 #endif

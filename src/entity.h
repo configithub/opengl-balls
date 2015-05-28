@@ -15,8 +15,12 @@ extern ComponentFactory<Rectangle> shape_factory;
 extern ComponentFactory<AABB> mask_factory;
 
 typedef enum {
-  GHOST = 1 << 0,
-  GRAVITY_BOUND = 2 << 0,
+  DEAD =  2,
+  GHOST = 4,
+  GRAVITY_BOUND = 8
+  //DEAD = 1 << 0,
+  //GHOST = 2 << 0,
+  //GRAVITY_BOUND = 4 << 0,
 } EN_Flag;
 
 class Entity {
@@ -42,5 +46,21 @@ public:
 
 };
 
+
+class EntityFactory {
+public:
+
+  EntityFactory(): nb_entity(0) {}
+
+  Entity& create();
+  void remove(Entity& entity);
+
+  Entity entities[max_entity_nb];
+  int nb_entity;
+
+};
+
+
+extern EntityFactory entity_factory;
 
 #endif

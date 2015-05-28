@@ -3,8 +3,6 @@
 
 SDL_Event events;
 bool running;
-Entity entities[max_entity_nb];
-int entity_nb = 0;
 
 const int speed_factor = 4;
 const int size_factor = 20;
@@ -59,13 +57,15 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_r:
       respawn();
     break;
+    case SDLK_d:
+      remove_random_ball();
+    break;
   }
 }
 
 
 void add_ball() {
-  Entity& entity = entities[entity_nb];
-  entity.id = entity_nb;
+  Entity& entity = entity_factory.create();
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
@@ -79,13 +79,11 @@ void add_ball() {
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
   entity.flags = GHOST;
-  ++entity_nb;
 }
 
 
 void add_random_ball() {
-  Entity& entity = entities[entity_nb];
-  entity.id = entity_nb;
+  Entity& entity = entity_factory.create();
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
@@ -99,13 +97,11 @@ void add_random_ball() {
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
   entity.flags = GHOST;
-  ++entity_nb;
 }
 
 
 void add_hard_ball() {
-  Entity& entity = entities[entity_nb];
-  entity.id = entity_nb;
+  Entity& entity = entity_factory.create();
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
@@ -118,13 +114,11 @@ void add_hard_ball() {
   entity.shape->h = size_factor;
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
-  ++entity_nb;
 }
 
 
 void add_random_hard_ball() {
-  Entity& entity = entities[entity_nb];
-  entity.id = entity_nb;
+  Entity& entity = entity_factory.create();
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
@@ -137,13 +131,11 @@ void add_random_hard_ball() {
   entity.shape->h = size_factor;
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
-  ++entity_nb;
 }
 
 
 void add_random_rotated_ball() {
-  Entity& entity = entities[entity_nb];
-  entity.id = entity_nb;
+  Entity& entity = entity_factory.create();
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
@@ -157,13 +149,11 @@ void add_random_rotated_ball() {
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
   entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
-  ++entity_nb;
 }
 
 
 void add_random_rotating_ball() {
-  Entity& entity = entities[entity_nb];
-  entity.id = entity_nb;
+  Entity& entity = entity_factory.create();
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
@@ -178,13 +168,11 @@ void add_random_rotating_ball() {
   entity.mask->h = size_factor;
   entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
   entity.speed->omega = PI *( (float) (rand() % 20) / 250);
-  ++entity_nb;
 }
 
 
 void add_falling_ball() {
-  Entity& entity = entities[entity_nb];
-  entity.id = entity_nb;
+  Entity& entity = entity_factory.create();
   entity.position = position_factory.create();
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
@@ -202,7 +190,14 @@ void add_falling_ball() {
   entity.speed->omega = PI *( (float) (rand() % 20) / 250);
   entity.flags = GRAVITY_BOUND;
   entity.accel->friction = 1;
-  ++entity_nb;
+}
+
+
+void remove_random_ball() {
+  if(entity_factory.nb_entity <= 0) { return; }
+  int id_to_remove = rand() % entity_factory.nb_entity;
+  Entity& entity_to_remove = entity_factory.entities[id_to_remove];
+  entity_factory.remove(entity_to_remove);
 }
 
 
@@ -243,18 +238,18 @@ void init_entities() {
 
 
 void respawn() {
-  for (int i = 0; i <= entity_nb; ++i) {
-    Entity& entity = entities[i];
-    entity.remove();
+  int entity_nb = entity_factory.nb_entity;
+  for (int i = 0; i < entity_nb; ++i) {
+    Entity& entity = entity_factory.entities[i];
+    entity_factory.remove(entity);
   }
-  entity_nb = 0;
   init_entities();
 }
 
 
 void apply_gravity() {
-  for (int i = 0; i <= entity_nb; ++i) {
-    Entity& entity = entities[i];
+  for (int i = 0; i < entity_factory.nb_entity; ++i) {
+    Entity& entity = entity_factory.entities[i];
     if(entity.accel == NULL) { continue; }
     entity.accel->ay = entity.flags & GRAVITY_BOUND ? 2 : 0;
   }
@@ -262,24 +257,24 @@ void apply_gravity() {
 
 
 void update_positions() {
-  for (int i = 0; i <= entity_nb; ++i) {
-    Entity& entity = entities[i];
+  for (int i = 0; i < entity_factory.nb_entity; ++i) {
+    Entity& entity = entity_factory.entities[i];
     update_position_inertial(entity);
   }
 }
 
 
 void do_collisions() {
-  for (int i = 0; i <= entity_nb; ++i) {
-    Entity& entity = entities[i];
+  for (int i = 0; i < entity_factory.nb_entity; ++i) {
+    Entity& entity = entity_factory.entities[i];
     check_collision(entity);
   }
 }
 
 
 void do_render() {
-  for (int i = 0; i <= entity_nb; ++i) {
-    Entity& entity = entities[i];
+  for (int i = 0; i < entity_factory.nb_entity; ++i) {
+    Entity& entity = entity_factory.entities[i];
     render_rotated(entity);
   }
 }

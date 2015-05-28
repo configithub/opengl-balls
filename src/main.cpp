@@ -9,7 +9,7 @@ const int size_factor = 20;
 
 const int starting_entity_nb = 15;
 
-int mode = 6; // RANDOM_FALLING_BALL_SPAWN
+int mode = FIREWORK_SPAWN; 
 
 
 
@@ -48,6 +48,12 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
         break;
         case RANDOM_FALLING_BALL_SPAWN:
           add_falling_ball();
+        break;
+        case EPHEMERAL_BALL_SPAWN:
+          add_ephemeral_ball();
+        break;
+        case FIREWORK_SPAWN:
+          add_firework();
         break;
       }
     break;
@@ -193,6 +199,57 @@ void add_falling_ball() {
 }
 
 
+void add_ephemeral_ball() {
+  Entity& entity = entity_factory.create();
+  entity.position = position_factory.create();
+  entity.speed = speed_factory.create();
+  entity.shape = shape_factory.create();
+  entity.mask = mask_factory.create();
+  entity.accel = accel_factory.create();
+  entity.position->x = rand() % WWIDTH;
+  entity.position->y = rand() % WHEIGHT;
+  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
+  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
+  entity.speed->omega = PI *( (float) (rand() % 20) / 250);
+  entity.flags = GRAVITY_BOUND | EPHEMERAL;
+  entity.lifespan = 100; // entity will live 100 frames
+  entity.accel->friction = 1;
+}
+
+
+void add_firework() {
+  int x = rand() % WWIDTH;
+  int y = rand() % WHEIGHT;
+  int n = 5 + rand() % 5;
+  for(int i =0; i< n; ++i) {
+    Entity& entity = entity_factory.create();
+    entity.position = position_factory.create();
+    entity.speed = speed_factory.create();
+    entity.shape = shape_factory.create();
+    entity.mask = mask_factory.create();
+    entity.accel = accel_factory.create();
+    entity.position->x = x;
+    entity.position->y = y;
+    entity.speed->vx = rand() % 20*speed_factor - 10*speed_factor;
+    entity.speed->vy = rand() % 20*speed_factor - 10*speed_factor;
+    entity.shape->w = size_factor;
+    entity.shape->h = size_factor;
+    entity.mask->w = size_factor;
+    entity.mask->h = size_factor;
+    entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
+    entity.speed->omega = PI *( (float) (rand() % 20) / 250);
+    entity.flags = GRAVITY_BOUND | EPHEMERAL | GHOST;
+    entity.lifespan = 50; 
+    entity.accel->friction = 1;
+  }
+}
+
+
 void remove_random_ball() {
   if(entity_factory.nb_entity <= 0) { return; }
   int id_to_remove = rand() % entity_factory.nb_entity;
@@ -231,6 +288,12 @@ void init_entities() {
       break;
       case RANDOM_FALLING_BALL_SPAWN:
         add_falling_ball();
+      break;
+      case EPHEMERAL_BALL_SPAWN:
+        add_ephemeral_ball();
+      break;
+      case FIREWORK_SPAWN:
+        add_firework();
       break;
     }
   }
@@ -280,6 +343,18 @@ void do_render() {
 }
 
 
+void process_ephemerals() {
+  for (int i = 0; i < entity_factory.nb_entity; ++i) {
+    Entity& entity = entity_factory.entities[i];
+    if(!(entity.flags & EPHEMERAL)) { continue; }
+    entity.lifespan--;
+    if(entity.lifespan == 0) {
+      entity_factory.remove(entity);
+    }
+  }
+}
+
+
 void loop() {
   running = true;
   while(running) { 
@@ -288,6 +363,7 @@ void loop() {
     apply_gravity();
     update_positions();
     do_collisions();
+    process_ephemerals();
     do_render();
     SDL_GL_SwapBuffers(); // refresh screen
   }

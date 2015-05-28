@@ -17,10 +17,8 @@ extern ComponentFactory<AABB> mask_factory;
 typedef enum {
   DEAD =  2,
   GHOST = 4,
-  GRAVITY_BOUND = 8
-  //DEAD = 1 << 0,
-  //GHOST = 2 << 0,
-  //GRAVITY_BOUND = 4 << 0,
+  GRAVITY_BOUND = 8,
+  EPHEMERAL = 16
 } EN_Flag;
 
 class Entity {
@@ -30,6 +28,7 @@ public:
   Rectangle* shape;
   AABB* mask;
   Accel* accel;
+  int lifespan;
 
   int id;
   int flags; // bitset
@@ -40,7 +39,7 @@ public:
             shape(NULL),
             mask(NULL),
             accel(NULL), 
-            flags(0) {};
+            flags(0), lifespan(-1) {};
 
   void remove();
 

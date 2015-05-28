@@ -23,6 +23,10 @@ void add_random_rotating_ball();
 
 void add_falling_ball();
 
+void add_ephemeral_ball();
+
+void add_firework();
+
 void remove_random_ball();
 
 void switch_mode();
@@ -38,6 +42,8 @@ void update_positions();
 void do_collisions();
 
 void do_render();
+
+void process_ephemerals();
 
 void loop();
 
@@ -58,6 +64,8 @@ typedef enum {
   RANDOM_ROTATED_BALL_SPAWN,
   RANDOM_ROTATING_BALL_SPAWN,
   RANDOM_FALLING_BALL_SPAWN,
+  EPHEMERAL_BALL_SPAWN,
+  FIREWORK_SPAWN,
   MAX_MODE
 } GAME_MODE;
 

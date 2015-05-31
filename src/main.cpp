@@ -218,7 +218,7 @@ void add_ephemeral_ball() {
   entity.speed->omega = PI *( (float) (rand() % 20) / 250);
   entity.flags = GRAVITY_BOUND | EPHEMERAL;
   entity.lifespan = 100; // entity will live 100 frames
-  entity.accel->friction = 1;
+  entity.accel->friction = 1.0;
 }
 
 
@@ -245,7 +245,7 @@ void add_firework() {
     entity.speed->omega = PI *( (float) (rand() % 20) / 250);
     entity.flags = GRAVITY_BOUND | EPHEMERAL | GHOST;
     entity.lifespan = 50; 
-    entity.accel->friction = 1;
+    entity.accel->friction = 0.5;
   }
 }
 

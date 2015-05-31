@@ -17,8 +17,8 @@ public:
 
 class Speed : public Component {
 public:
-  int vx;
-  int vy;
+  float vx;
+  float vy;
   float omega;
   Speed(): vx(0), vy(0), omega(0.0) {}
 };
@@ -26,9 +26,9 @@ public:
 
 class Accel : public Component {
 public:
-  int ax;
-  int ay;
-  int friction; // for inelastic rebound
+  float ax;
+  float ay;
+  float friction; // for inelastic rebound
   Accel() : ax(0), ay(0), friction(0) {}
 };
 

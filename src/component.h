@@ -3,40 +3,48 @@
 #include "constants.h"
 
 
+class Entity;
+
 class Component {
 public:
-  Component() {}
+  Component(): type(0), entity(NULL) {}
+  int type;
+  Entity* entity;
+  void restore_entity_id(int comp_id);
 };
+
 
 template <class T> class ComponentFactory {
 public:
-  ComponentFactory(): nb_component(0),
-                      nb_dead_component(0) {}
-
-  T* create() {
-    if(nb_dead_component > 0) {
-      // revive a dead component
-      T* compo = component_graveyard[nb_dead_component-1];
-      *compo = T();
-      --nb_dead_component;
-      return compo;
-    }
-    T& compo = components[nb_component];
-    ++nb_component;
-    return &compo;
+  friend class Component;
+  friend class Entity;
+  ComponentFactory(int itype): nb_component(0) {
+    type = itype;
   }
 
-  void remove(T* compo) {
-    if(nb_component == 0) { return; }
-    component_graveyard[nb_dead_component] = compo;
-    ++nb_dead_component;
+  int create(Entity& ent) {
+    T& compo = components[nb_component];
+    compo = T();
+    compo.entity = &ent;
+    compo.type = type;
+    ++nb_component;
+    //return nb_component++;
+    return nb_component-1;
+  }
+
+  void remove(int comp_id) {
+    if(nb_component <= 0) { return; }
+    T& component = components[comp_id];
+    component = components[nb_component-1];
+    component.restore_entity_id(comp_id);
+    --nb_component;
   }
 
 private:
   int nb_component;
+  int type;
   T components[max_entity_nb];
-  int nb_dead_component;
-  T* component_graveyard[max_entity_nb];
 };
+
 
 #endif

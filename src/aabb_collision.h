@@ -22,5 +22,6 @@ void do_collision(Entity& entity, Entity& other);
 
 void do_collision_repulse(Entity& entity, Entity& other);
 
+extern ComponentFactory<AABB> mask_factory;
 
 #endif

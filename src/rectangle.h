@@ -13,8 +13,9 @@ public:
   Rectangle(): w(0), h(0) {}
 };
 
+void render_basic(Entity& entity);
 void render(Entity& entity);
-void render_rotated(Entity& entity);
 
+extern ComponentFactory<Rectangle> shape_factory;
 
 #endif

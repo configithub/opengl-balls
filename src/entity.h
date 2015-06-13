@@ -1,47 +1,44 @@
 #ifndef _ENTITY_H_
 #define _ENTITY_H_
 #include "constants.h"
-#include "component.h"
 
-#include "position.h"
-#include "aabb_collision.h"
-#include "rectangle.h"
+class Component;
 
-// component factories
-extern ComponentFactory<Position> position_factory;
-extern ComponentFactory<Speed> speed_factory;
-extern ComponentFactory<Accel> accel_factory;
-extern ComponentFactory<Rectangle> shape_factory;
-extern ComponentFactory<AABB> mask_factory;
+class Position;
+class Speed;
+class Accel;
+class AABB;
+class Rectangle;
 
-typedef enum {
-  DEAD =  2,
-  GHOST = 4,
-  GRAVITY_BOUND = 8,
-  EPHEMERAL = 16
-} EN_Flag;
 
 class Entity {
 public:
-  Position* position;
-  Speed* speed;
-  Rectangle* shape;
-  AABB* mask;
-  Accel* accel;
+  int comp_id[MAX_COMPONENT_TYPE];
   int lifespan;
 
   int id;
   int flags; // bitset
 
   // init all components to null
-  Entity(): id(0), position(NULL), 
-            speed(NULL),
-            shape(NULL),
-            mask(NULL),
-            accel(NULL), 
-            flags(0), lifespan(-1) {};
+  Entity();
 
   void remove();
+  void restore_compo_pointers();
+
+  int& position_id();
+  Position* position();
+
+  int& speed_id();
+  Speed* speed();
+
+  int& shape_id();
+  Rectangle* shape();
+
+  int& accel_id();
+  Accel* accel();
+
+  int& mask_id();
+  AABB* mask();
 
 };
 

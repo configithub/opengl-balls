@@ -1,16 +1,17 @@
 #include "rectangle.h"
+#include "position.h"
 #include "render_tools.h"
 #include "entity.h"
 
 #include <math.h>
 
-Rectangle rectangles[max_entity_nb];
+ComponentFactory<Rectangle> shape_factory(SHAPE);
 
-void render(Entity& entity) {
-  if ( entity.position == NULL 
-    || entity.shape == NULL) { return; }
-  Position& pos = *(entity.position);
-  Rectangle& rect = *(entity.shape);
+void render_basic(Entity& entity) {
+  if ( entity.position() == NULL 
+    || entity.shape() == NULL) { return; }
+  Position& pos = *(entity.position());
+  Rectangle& rect = *(entity.shape());
   int w = rect.w/2; int h = rect.h/2;
   draw_hollow_square(pos.x-w, pos.y-h,
                      pos.x+w, pos.y-h,
@@ -18,12 +19,12 @@ void render(Entity& entity) {
                      pos.x-w, pos.y+h);
 }
 
-void render_rotated(Entity& entity) {
-  if ( entity.position == NULL 
-    || entity.shape == NULL) { return; }
-  if ( entity.position->theta == 0 ) { render(entity); return; }
-  Position& pos = *(entity.position);
-  Rectangle& rect = *(entity.shape);
+void render(Entity& entity) {
+  if ( entity.position() == NULL 
+    || entity.shape() == NULL) { return; }
+  if ( entity.position()->theta == 0 ) { render_basic(entity); return; }
+  Position& pos = *(entity.position());
+  Rectangle& rect = *(entity.shape());
   int w = rect.w/2; int h = rect.h/2;
   float cos_theta = cos(pos.theta);
   float sin_theta = sin(pos.theta);

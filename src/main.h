@@ -1,7 +1,6 @@
 #ifndef _main_H_
 #define _main_H_
 
-#include "entity.h"
 #include "constants.h"
 #include "render_tools.h"
 
@@ -28,6 +27,8 @@ void add_ephemeral_ball();
 void add_firework();
 
 void remove_random_ball();
+
+void print_debug_info();
 
 void switch_mode();
 

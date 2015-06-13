@@ -39,4 +39,8 @@ void update_position_angular(Entity& entity);
 void update_position_inertial(Entity& entity);
 
 
+extern ComponentFactory<Position> position_factory;
+extern ComponentFactory<Speed> speed_factory;
+extern ComponentFactory<Accel> accel_factory;
+
 #endif

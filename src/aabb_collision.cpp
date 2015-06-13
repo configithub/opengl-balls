@@ -1,18 +1,18 @@
 #include "aabb_collision.h"
+#include "position.h"
 #include "entity.h"
 
 #include "main.h"
 #include <math.h>
 
-AABB aabbs[max_entity_nb];
-
+ComponentFactory<AABB> mask_factory(MASK);
 
 void check_collision(Entity& entity) {
   if(entity.flags & GHOST) { return; }
-  if ( entity.position == NULL 
-    || entity.mask == NULL) { return; }
-  Position& pos = *(entity.position);
-  AABB& mask = *(entity.mask);
+  if ( entity.position() == NULL 
+    || entity.mask() == NULL) { return; }
+  Position& pos = *(entity.position());
+  AABB& mask = *(entity.mask());
   if(mask.w == 0 && mask.h == 0) { return; } // ghost object
   int w = mask.w/2; int h = mask.h/2;
   int x1 = pos.x-w; int y1 = pos.y-h;
@@ -20,10 +20,11 @@ void check_collision(Entity& entity) {
   for(int i= 0; i < entity_factory.nb_entity; ++i) {
     Entity& other = entity_factory.entities[i];
     if(other.id <= entity.id) { continue; } // prevent self and double collision
-    if ( other.position == NULL 
-      || other.mask == NULL) { continue; }
-    Position& opos = *(other.position);
-    AABB& omask = *(other.mask);
+    if ( other.position() == NULL 
+      || other.mask() == NULL
+      || other.flags & GHOST) { continue; }
+    Position& opos = *(other.position());
+    AABB& omask = *(other.mask());
     int ow = omask.w/2; int oh = omask.h/2;
     int ox1 = opos.x-ow; int oy1 = opos.y-oh;
     int ox2 = opos.x+ow; int oy2 = opos.y+oh;
@@ -38,8 +39,8 @@ void check_collision(Entity& entity) {
 
 void do_collision(Entity& entity, Entity& other) {
   // elastic collision
-  Speed& speed = *(entity.speed);
-  Speed& ospeed = *(other.speed);
+  Speed& speed = *(entity.speed());
+  Speed& ospeed = *(other.speed());
   int vx = speed.vx;
   int vy = speed.vy;
   speed.vx = ospeed.vx;
@@ -51,8 +52,8 @@ void do_collision(Entity& entity, Entity& other) {
 
 void do_collision_repulse(Entity& entity, Entity& other) {
   // elastic collision
-  Speed& speed = *(entity.speed);
-  Speed& ospeed = *(other.speed);
+  Speed& speed = *(entity.speed());
+  Speed& ospeed = *(other.speed());
   int vx = speed.vx;
   int vy = speed.vy;
   speed.vx = ospeed.vx;
@@ -60,13 +61,13 @@ void do_collision_repulse(Entity& entity, Entity& other) {
   ospeed.vx = vx;
   ospeed.vy = vy;
   // repulsion to avoid interlock
-  Position& pos = *(entity.position);
-  AABB& mask = *(entity.mask);
+  Position& pos = *(entity.position());
+  AABB& mask = *(entity.mask());
   int w = mask.w/2; int h = mask.h/2;
   int x1 = pos.x-w; int y1 = pos.y-h;
   int x2 = pos.x+w; int y2 = pos.y+h;
-  Position& opos = *(other.position);
-  AABB& omask = *(other.mask);
+  Position& opos = *(other.position());
+  AABB& omask = *(other.mask());
   int ow = omask.w/2; int oh = omask.h/2;
   int ox1 = opos.x-ow; int oy1 = opos.y-oh;
   int ox2 = opos.x+ow; int oy2 = opos.y+oh;

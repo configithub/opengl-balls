@@ -1,6 +1,11 @@
 #include "main.h"
 #include <stdio.h>
 
+#include "rectangle.h"
+#include "position.h"
+#include "aabb_collision.h"
+#include "entity.h"
+
 SDL_Event events;
 bool running;
 
@@ -9,7 +14,8 @@ const int size_factor = 20;
 
 const int starting_entity_nb = 15;
 
-int mode = FIREWORK_SPAWN; 
+//int mode = FIREWORK_SPAWN; 
+int mode = 6; 
 
 
 
@@ -66,159 +72,162 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_d:
       remove_random_ball();
     break;
+    case SDLK_p:
+      print_debug_info();
+    break;
   }
 }
 
 
 void add_ball() {
   Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.position->x = 0;
-  entity.position->y = 0;
-  entity.speed->vx = speed_factor;
-  entity.speed->vy = speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
+  entity.position_id() = position_factory.create(entity);
+  entity.speed_id() = speed_factory.create(entity);
+  entity.shape_id() = shape_factory.create(entity);
+  entity.mask_id() = mask_factory.create(entity);
+  entity.position()->x = 0;
+  entity.position()->y = 0;
+  entity.speed()->vx = speed_factor;
+  entity.speed()->vy = speed_factor;
+  entity.shape()->w = size_factor;
+  entity.shape()->h = size_factor;
+  entity.mask()->w = size_factor;
+  entity.mask()->h = size_factor;
   entity.flags = GHOST;
 }
 
 
 void add_random_ball() {
   Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.position->x = rand() % WWIDTH;
-  entity.position->y = rand() % WHEIGHT;
-  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
-  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
+  entity.position_id() = position_factory.create(entity);
+  entity.speed_id() = speed_factory.create(entity);
+  entity.shape_id() = shape_factory.create(entity);
+  entity.mask_id() = mask_factory.create(entity);
+  entity.position()->x = rand() % WWIDTH;
+  entity.position()->y = rand() % WHEIGHT;
+  entity.speed()->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed()->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape()->w = size_factor;
+  entity.shape()->h = size_factor;
+  entity.mask()->w = size_factor;
+  entity.mask()->h = size_factor;
   entity.flags = GHOST;
 }
 
 
 void add_hard_ball() {
   Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.position->x = 0;
-  entity.position->y = 0;
-  entity.speed->vx = speed_factor;
-  entity.speed->vy = speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
+  entity.position_id() = position_factory.create(entity);
+  entity.speed_id() = speed_factory.create(entity);
+  entity.shape_id() = shape_factory.create(entity);
+  entity.mask_id() = mask_factory.create(entity);
+  entity.position()->x = 0;
+  entity.position()->y = 0;
+  entity.speed()->vx = speed_factor;
+  entity.speed()->vy = speed_factor;
+  entity.shape()->w = size_factor;
+  entity.shape()->h = size_factor;
+  entity.mask()->w = size_factor;
+  entity.mask()->h = size_factor;
 }
 
 
 void add_random_hard_ball() {
   Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.position->x = rand() % WWIDTH;
-  entity.position->y = rand() % WHEIGHT;
-  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
-  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
+  entity.position_id() = position_factory.create(entity);
+  entity.speed_id() = speed_factory.create(entity);
+  entity.shape_id() = shape_factory.create(entity);
+  entity.mask_id() = mask_factory.create(entity);
+  entity.position()->x = rand() % WWIDTH;
+  entity.position()->y = rand() % WHEIGHT;
+  entity.speed()->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed()->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape()->w = size_factor;
+  entity.shape()->h = size_factor;
+  entity.mask()->w = size_factor;
+  entity.mask()->h = size_factor;
 }
 
 
 void add_random_rotated_ball() {
   Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.position->x = rand() % WWIDTH;
-  entity.position->y = rand() % WHEIGHT;
-  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
-  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
-  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
+  entity.position_id() = position_factory.create(entity);
+  entity.speed_id() = speed_factory.create(entity);
+  entity.shape_id() = shape_factory.create(entity);
+  entity.mask_id() = mask_factory.create(entity);
+  entity.position()->x = rand() % WWIDTH;
+  entity.position()->y = rand() % WHEIGHT;
+  entity.speed()->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed()->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape()->w = size_factor;
+  entity.shape()->h = size_factor;
+  entity.mask()->w = size_factor;
+  entity.mask()->h = size_factor;
+  entity.position()->theta = 2 * PI * (float) (rand() % 100) / 100;
 }
 
 
 void add_random_rotating_ball() {
   Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.position->x = rand() % WWIDTH;
-  entity.position->y = rand() % WHEIGHT;
-  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
-  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
-  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
-  entity.speed->omega = PI *( (float) (rand() % 20) / 250);
+  entity.position_id() = position_factory.create(entity);
+  entity.speed_id() = speed_factory.create(entity);
+  entity.shape_id() = shape_factory.create(entity);
+  entity.mask_id() = mask_factory.create(entity);
+  entity.position()->x = rand() % WWIDTH;
+  entity.position()->y = rand() % WHEIGHT;
+  entity.speed()->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed()->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape()->w = size_factor;
+  entity.shape()->h = size_factor;
+  entity.mask()->w = size_factor;
+  entity.mask()->h = size_factor;
+  entity.position()->theta = 2 * PI * (float) (rand() % 100) / 100;
+  entity.speed()->omega = PI *( (float) (rand() % 20) / 250);
 }
 
 
 void add_falling_ball() {
   Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.accel = accel_factory.create();
-  entity.position->x = rand() % WWIDTH;
-  entity.position->y = rand() % WHEIGHT;
-  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
-  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
-  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
-  entity.speed->omega = PI *( (float) (rand() % 20) / 250);
+  entity.position_id() = position_factory.create(entity);
+  entity.speed_id() = speed_factory.create(entity);
+  entity.shape_id() = shape_factory.create(entity);
+  entity.mask_id() = mask_factory.create(entity);
+  entity.accel_id() = accel_factory.create(entity);
+  entity.position()->x = rand() % WWIDTH;
+  entity.position()->y = rand() % WHEIGHT;
+  entity.speed()->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed()->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape()->w = size_factor;
+  entity.shape()->h = size_factor;
+  entity.mask()->w = size_factor;
+  entity.mask()->h = size_factor;
+  entity.position()->theta = 2 * PI * (float) (rand() % 100) / 100;
+  entity.speed()->omega = PI *( (float) (rand() % 20) / 250);
   entity.flags = GRAVITY_BOUND;
-  entity.accel->friction = 1;
+  entity.accel()->friction = 1;
 }
 
 
 void add_ephemeral_ball() {
   Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.accel = accel_factory.create();
-  entity.position->x = rand() % WWIDTH;
-  entity.position->y = rand() % WHEIGHT;
-  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
-  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
-  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
-  entity.speed->omega = PI *( (float) (rand() % 20) / 250);
+  entity.position_id() = position_factory.create(entity);
+  entity.speed_id() = speed_factory.create(entity);
+  entity.shape_id() = shape_factory.create(entity);
+  entity.mask_id() = mask_factory.create(entity);
+  entity.accel_id() = accel_factory.create(entity);
+  entity.position()->x = rand() % WWIDTH;
+  entity.position()->y = rand() % WHEIGHT;
+  entity.speed()->vx = rand() % 4*speed_factor - 2*speed_factor;
+  entity.speed()->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.shape()->w = size_factor;
+  entity.shape()->h = size_factor;
+  entity.mask()->w = size_factor;
+  entity.mask()->h = size_factor;
+  entity.position()->theta = 2 * PI * (float) (rand() % 100) / 100;
+  entity.speed()->omega = PI *( (float) (rand() % 20) / 250);
   entity.flags = GRAVITY_BOUND | EPHEMERAL;
   entity.lifespan = 100; // entity will live 100 frames
-  entity.accel->friction = 1.0;
+  entity.accel()->friction = 1.0;
 }
 
 
@@ -228,24 +237,24 @@ void add_firework() {
   int n = 5 + rand() % 5;
   for(int i =0; i< n; ++i) {
     Entity& entity = entity_factory.create();
-    entity.position = position_factory.create();
-    entity.speed = speed_factory.create();
-    entity.shape = shape_factory.create();
-    entity.mask = mask_factory.create();
-    entity.accel = accel_factory.create();
-    entity.position->x = x;
-    entity.position->y = y;
-    entity.speed->vx = rand() % 20*speed_factor - 10*speed_factor;
-    entity.speed->vy = rand() % 20*speed_factor - 10*speed_factor;
-    entity.shape->w = size_factor;
-    entity.shape->h = size_factor;
-    entity.mask->w = size_factor;
-    entity.mask->h = size_factor;
-    entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
-    entity.speed->omega = PI *( (float) (rand() % 20) / 250);
+    entity.position_id() = position_factory.create(entity);
+    entity.speed_id() = speed_factory.create(entity);
+    entity.shape_id() = shape_factory.create(entity);
+    entity.mask_id() = mask_factory.create(entity);
+    entity.accel_id() = accel_factory.create(entity);
+    entity.position()->x = x;
+    entity.position()->y = y;
+    entity.speed()->vx = rand() % 20*speed_factor - 10*speed_factor;
+    entity.speed()->vy = rand() % 20*speed_factor - 10*speed_factor;
+    entity.shape()->w = size_factor;
+    entity.shape()->h = size_factor;
+    entity.mask()->w = size_factor;
+    entity.mask()->h = size_factor;
+    entity.position()->theta = 2 * PI * (float) (rand() % 100) / 100;
+    entity.speed()->omega = PI *( (float) (rand() % 20) / 250);
     entity.flags = GRAVITY_BOUND | EPHEMERAL | GHOST;
     entity.lifespan = 50; 
-    entity.accel->friction = 0.5;
+    entity.accel()->friction = 0.5;
   }
 }
 
@@ -255,6 +264,18 @@ void remove_random_ball() {
   int id_to_remove = rand() % entity_factory.nb_entity;
   Entity& entity_to_remove = entity_factory.entities[id_to_remove];
   entity_factory.remove(entity_to_remove);
+}
+
+
+void print_debug_info() {
+  for (int i = 0; i < entity_factory.nb_entity; ++i) {
+    printf("entity %d, address %d :\n", i, &(entity_factory.entities[i]));
+    for (int c = 0; c < MAX_COMPONENT_TYPE; ++c) {
+      printf("  comp_id[%d] = %d", c, entity_factory.entities[i].comp_id[c]);
+    }
+    printf("\n");
+    printf("  point_back %d\n", entity_factory.entities[i].position()->entity);
+  }
 }
 
 
@@ -313,8 +334,8 @@ void respawn() {
 void apply_gravity() {
   for (int i = 0; i < entity_factory.nb_entity; ++i) {
     Entity& entity = entity_factory.entities[i];
-    if(entity.accel == NULL) { continue; }
-    entity.accel->ay = entity.flags & GRAVITY_BOUND ? 2 : 0;
+    if(entity.accel() == NULL) { continue; }
+    entity.accel()->ay = entity.flags & GRAVITY_BOUND ? 2 : 0;
   }
 }
 
@@ -338,7 +359,7 @@ void do_collisions() {
 void do_render() {
   for (int i = 0; i < entity_factory.nb_entity; ++i) {
     Entity& entity = entity_factory.entities[i];
-    render_rotated(entity);
+    render(entity);
   }
 }
 

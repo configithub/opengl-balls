@@ -1,6 +1,11 @@
 #include "position.h"
+#include "aabb_collision.h"
 #include "entity.h"
 #include "constants.h"
+
+ComponentFactory<Position> position_factory(POSITION);
+ComponentFactory<Speed> speed_factory(SPEED);
+ComponentFactory<Accel> accel_factory(ACCEL);
 
 int sgn(int val) {
   return (0 < val) - (val < 0);
@@ -8,12 +13,12 @@ int sgn(int val) {
 
 
 void update_position(Entity& entity) {
-  if( entity.position == NULL 
-   || entity.speed == NULL
-   || entity.mask == NULL) { return; }
-  Position& pos = *(entity.position);
-  Speed& speed = *(entity.speed);
-  AABB& mask = *(entity.mask);
+  if( entity.position() == NULL 
+   || entity.speed() == NULL
+   || entity.mask() == NULL) { return; }
+  Position& pos = *(entity.position());
+  Speed& speed = *(entity.speed());
+  AABB& mask = *(entity.mask());
   pos.x += speed.vx;
   pos.y += speed.vy;
   if(pos.x <= mask.w/2 || pos.x >= WWIDTH-mask.w/2) {
@@ -29,12 +34,12 @@ void update_position(Entity& entity) {
 
 
 void update_position_angular(Entity& entity) {
-  if( entity.position == NULL 
-   || entity.speed == NULL
-   || entity.mask == NULL) { return; }
-  Position& pos = *(entity.position);
-  Speed& speed = *(entity.speed);
-  AABB& mask = *(entity.mask);
+  if( entity.position() == NULL 
+   || entity.speed() == NULL
+   || entity.mask() == NULL) { return; }
+  Position& pos = *(entity.position());
+  Speed& speed = *(entity.speed());
+  AABB& mask = *(entity.mask());
   pos.x += speed.vx;
   pos.y += speed.vy;
   if(pos.x <= mask.w/2 || pos.x >= WWIDTH-mask.w/2) {
@@ -54,17 +59,17 @@ void update_position_angular(Entity& entity) {
 
 
 void update_position_inertial(Entity& entity) {
-  if( entity.accel == NULL ) {
+  if( entity.accel() == NULL ) {
     update_position_angular(entity);
     return;
   }
-  if( entity.position == NULL 
-   || entity.speed == NULL
-   || entity.mask == NULL) { return; }
-  Position& pos = *(entity.position);
-  Speed& speed = *(entity.speed);
-  Accel& accel = *(entity.accel);
-  AABB& mask = *(entity.mask);
+  if( entity.position() == NULL 
+   || entity.speed() == NULL
+   || entity.mask() == NULL) { return; }
+  Position& pos = *(entity.position());
+  Speed& speed = *(entity.speed());
+  Accel& accel = *(entity.accel());
+  AABB& mask = *(entity.mask());
   speed.vx += accel.ax - sgn(speed.vx)*accel.friction;
   speed.vy += accel.ay - sgn(speed.vy)*accel.friction;
   pos.x += speed.vx;

@@ -3,7 +3,7 @@ CFLAGS=-g -O3 -std=c99 --float-store
 INCLUDES=-I/usr/include
 LDFLAGS=-lm -lSDLmain -lSDL -lSDL_image -lGL -L/usr/lib/x86_64-linux-gnu   
 SRC_DIR=src
-SOURCES=src/main.cpp src/render_tools.cpp src/position.cpp src/rectangle.cpp src/aabb_collision.cpp src/entity.cpp
+SOURCES=src/main.cpp src/render_tools.cpp src/position.cpp src/rectangle.cpp src/aabb_collision.cpp src/entity.cpp src/tile.cpp
 OBJECTS=$(SOURCES:.c=.o)
 HEADERS=$(SOURCES:.c=.h)
 MAIN=bin/app

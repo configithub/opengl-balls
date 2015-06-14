@@ -1,6 +1,7 @@
 #ifndef _ENTITY_H_
 #define _ENTITY_H_
 #include "constants.h"
+#include "object.h"
 #include "component.h"
 
 #include "position.h"
@@ -21,47 +22,26 @@ typedef enum {
   EPHEMERAL = 16
 } EN_Flag;
 
-class Entity {
+class Entity : public Object {
 public:
   Position* position;
   Speed* speed;
   Rectangle* shape;
   AABB* mask;
   Accel* accel;
-  int lifespan;
-
-  int id;
-  int flags; // bitset
 
   // init all components to null
-  Entity(): id(0), position(NULL), 
+  Entity(): position(NULL), 
             speed(NULL),
             shape(NULL),
             mask(NULL),
-            accel(NULL), 
-            flags(0), lifespan(-1) {};
+            accel(NULL) {};
 
   void remove();
 
 };
 
 
-class EntityFactory {
-public:
-
-  EntityFactory(): nb_entity(0) {}
-
-  Entity& create();
-  void remove(Entity& entity);
-
-  Entity entities[max_entity_nb];
-  int nb_entity;
-
-  static int next_id;
-
-};
-
-
-extern EntityFactory entity_factory;
+extern Factory<Entity> entity_factory;
 
 #endif

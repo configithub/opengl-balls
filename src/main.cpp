@@ -1,5 +1,4 @@
 #include "main.h"
-#include <stdio.h>
 
 SDL_Event events;
 bool running;
@@ -251,9 +250,9 @@ void add_firework() {
 
 
 void remove_random_ball() {
-  if(entity_factory.nb_entity <= 0) { return; }
-  int id_to_remove = rand() % entity_factory.nb_entity;
-  Entity& entity_to_remove = entity_factory.entities[id_to_remove];
+  if(entity_factory.nb_obj <= 0) { return; }
+  int id_to_remove = rand() % entity_factory.nb_obj;
+  Entity& entity_to_remove = entity_factory.objs[id_to_remove];
   entity_factory.remove(entity_to_remove);
 }
 
@@ -301,9 +300,9 @@ void init_entities() {
 
 
 void respawn() {
-  int entity_nb = entity_factory.nb_entity;
+  int entity_nb = entity_factory.nb_obj;
   for (int i = 0; i < entity_nb; ++i) {
-    Entity& entity = entity_factory.entities[i];
+    Entity& entity = entity_factory.objs[i];
     entity_factory.remove(entity);
   }
   init_entities();
@@ -311,8 +310,8 @@ void respawn() {
 
 
 void apply_gravity() {
-  for (int i = 0; i < entity_factory.nb_entity; ++i) {
-    Entity& entity = entity_factory.entities[i];
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
     if(entity.accel == NULL) { continue; }
     entity.accel->ay = entity.flags & GRAVITY_BOUND ? 2 : 0;
   }
@@ -320,32 +319,32 @@ void apply_gravity() {
 
 
 void update_positions() {
-  for (int i = 0; i < entity_factory.nb_entity; ++i) {
-    Entity& entity = entity_factory.entities[i];
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
     update_position_inertial(entity);
   }
 }
 
 
 void do_collisions() {
-  for (int i = 0; i < entity_factory.nb_entity; ++i) {
-    Entity& entity = entity_factory.entities[i];
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
     check_collision(entity);
   }
 }
 
 
 void do_render() {
-  for (int i = 0; i < entity_factory.nb_entity; ++i) {
-    Entity& entity = entity_factory.entities[i];
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
     render_rotated(entity);
   }
 }
 
 
 void process_ephemerals() {
-  for (int i = 0; i < entity_factory.nb_entity; ++i) {
-    Entity& entity = entity_factory.entities[i];
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
     if(!(entity.flags & EPHEMERAL)) { continue; }
     entity.lifespan--;
     if(entity.lifespan == 0) {

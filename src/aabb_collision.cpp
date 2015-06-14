@@ -17,8 +17,8 @@ void check_collision(Entity& entity) {
   int w = mask.w/2; int h = mask.h/2;
   int x1 = pos.x-w; int y1 = pos.y-h;
   int x2 = pos.x+w; int y2 = pos.y+h;
-  for(int i= 0; i < entity_factory.nb_entity; ++i) {
-    Entity& other = entity_factory.entities[i];
+  for(int i= 0; i < entity_factory.nb_obj; ++i) {
+    Entity& other = entity_factory.objs[i];
     if(other.id <= entity.id) { continue; } // prevent self and double collision
     if ( other.position == NULL 
       || other.mask == NULL) { continue; }

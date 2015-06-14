@@ -2,6 +2,7 @@
 #define _main_H_
 
 #include "entity.h"
+#include "tile.h"
 #include "constants.h"
 #include "render_tools.h"
 
@@ -33,6 +34,8 @@ void switch_mode();
 
 void init_entities();
 
+void init_tile_map();
+
 void respawn();
 
 void apply_gravity();
@@ -55,6 +58,8 @@ extern const int speed_factor;
 extern const int size_factor;
 
 extern const int starting_entity_nb;
+
+extern Area area;
 
 typedef enum {
   FIXED_BALL_SPAWN = 0,

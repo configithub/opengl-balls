@@ -9,6 +9,7 @@ const int size_factor = 20;
 const int starting_entity_nb = 15;
 
 int mode = FIREWORK_SPAWN; 
+Area area;
 
 
 
@@ -299,6 +300,33 @@ void init_entities() {
 }
 
 
+void init_tile_map() {
+  int width = WWIDTH / tile_size;
+  int height = WHEIGHT / tile_size;
+  int half_tile = tile_size / 2;
+  for(int k = 0; k < area_size; ++k) {
+    for(int j = 0; j < height; ++j) {
+      for(int i = 0; i < width; ++i) {
+        Tile& tile = area.tilemaps[k].tiles[width*j+i];
+        tile.flags = (i==0 && j==0) ? SOLID : VOID;
+        tile.position = tposition_factory.create();       
+        // TODO, variable area width and height, for now 3x3
+        tile.position->x = (k%3)*width+i*tile_size+half_tile;
+        tile.position->y = (k/3)*height+j*tile_size+half_tile;
+        if(tile.flags == SOLID) { 
+          tile.shape = tshape_factory.create();       
+          tile.mask = tmask_factory.create();       
+          tile.shape->w = tile_size;
+          tile.shape->h = tile_size;
+          tile.mask->w = tile_size;
+          tile.mask->h = tile_size;
+        }
+      }
+    } 
+  }
+}
+
+
 void respawn() {
   int entity_nb = entity_factory.nb_obj;
   for (int i = 0; i < entity_nb; ++i) {
@@ -335,6 +363,7 @@ void do_collisions() {
 
 
 void do_render() {
+  area.render();
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     render_rotated(entity);
@@ -372,6 +401,7 @@ void loop() {
 int main(int argc, char** argv) {
   init_sdl();
   init_entities();
+  init_tile_map();
   printf("starting pong\n"); 
   loop();
   printf("stopping pong\n");

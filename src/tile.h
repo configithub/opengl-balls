@@ -34,6 +34,24 @@ public:
 
 };
 
+class TileMap {
+public:
+  TileMap();
+  Tile tiles[(WWIDTH / tile_size) * (WHEIGHT / tile_size)];
+  int nb_tiles;
+  void render();
+};
+
+class Area {
+public:
+  int width;
+  int height;
+
+  TileMap tilemaps[area_size];
+  void render();
+
+};
+
 extern Factory<Tile> tile_factory;
 
 #endif

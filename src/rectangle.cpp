@@ -1,6 +1,7 @@
 #include "rectangle.h"
 #include "render_tools.h"
 #include "entity.h"
+#include "tile.h"
 
 #include <math.h>
 
@@ -16,6 +17,18 @@ void render(Entity& entity) {
                      pos.x+w, pos.y-h,
                      pos.x+w, pos.y+h,
                      pos.x-w, pos.y+h);
+}
+
+void render_tile(Tile& tile) {
+  if ( tile.position == NULL 
+    || tile.shape == NULL) { return; }
+  Position& pos = *(tile.position);
+  Rectangle& rect = *(tile.shape);
+  int w = rect.w/2; int h = rect.h/2;
+  draw_square(pos.x-w, pos.y-h,
+              pos.x+w, pos.y-h,
+              pos.x+w, pos.y+h,
+              pos.x-w, pos.y+h);
 }
 
 void render_rotated(Entity& entity) {

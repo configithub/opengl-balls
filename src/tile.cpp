@@ -22,3 +22,26 @@ void Tile::remove() {
     mask = NULL;
   }
 }
+
+
+TileMap::TileMap() {
+  nb_tiles = (WWIDTH / tile_size) * (WHEIGHT / tile_size);
+}
+
+
+void TileMap::render() {
+  for(int i = 0; i < nb_tiles; ++i) {
+    render_tile(tiles[i]);
+  }
+}
+
+void Area::render() {
+  // todo: only render what is visible
+  for(int i = 0; i < area_size; ++i) {
+    tilemaps[i].render();
+  }
+}
+
+
+
+

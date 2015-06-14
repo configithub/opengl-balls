@@ -5,6 +5,7 @@
 #include "component.h"
 
 class Entity;
+class Tile;
 
 class Rectangle : public Component {
 public:
@@ -14,6 +15,7 @@ public:
 };
 
 void render(Entity& entity);
+void render_tile(Tile& tile);
 void render_rotated(Entity& entity);
 
 

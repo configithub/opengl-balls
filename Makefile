@@ -1,7 +1,8 @@
 CC=g++
-CFLAGS=-g -O3 -std=c99 --float-store
+CFLAGS=-g -std=c99 --float-store
+#CFLAGS=-g -O3 -std=c99 --float-store
 INCLUDES=-I/usr/include
-LDFLAGS=-lm -lSDLmain -lSDL -lSDL_image -lGL -L/usr/lib/x86_64-linux-gnu   
+LDFLAGS=-g -lm -lSDLmain -lSDL -lSDL_image -lGL -L/usr/lib/x86_64-linux-gnu   
 SRC_DIR=src
 SOURCES=src/main.cpp src/render_tools.cpp src/position.cpp src/rectangle.cpp src/aabb_collision.cpp src/entity.cpp src/tile.cpp
 OBJECTS=$(SOURCES:.c=.o)

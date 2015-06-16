@@ -21,4 +21,5 @@ The branch named "alternative" contains code with a different memory layout for 
 perf stat -d ./bin/app
 
 perf record -g -F 199 ./bin/app
+
 perf report -G --stdio --sort=comm,dso --dsos=app,libc-2.19.so

@@ -6,8 +6,6 @@
 #define WWIDTH 640 // 40 tiles width
 #define WHEIGHT 480 // 30 tiles height
 #define tile_size 16
-#define area_width 1
-#define area_height 1
 #define BPP_DEPTH 16
 #define max_entity_nb 10000
 #define max_obj_nb 10000

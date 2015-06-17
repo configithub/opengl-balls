@@ -207,8 +207,6 @@ void add_falling_ball() {
   entity.shape->h = size_factor;
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
-  entity.position->theta = 2 * PI * (float) (rand() % 100) / 100;
-  entity.speed->omega = PI *( (float) (rand() % 20) / 250);
   entity.flags = GRAVITY_BOUND;
   entity.accel->friction = 1;
 }

@@ -1,4 +1,5 @@
 #include "main.h"
+#include "collision_system.h"
 
 SDL_Event events;
 bool running;
@@ -9,7 +10,7 @@ const int size_factor = 20;
 const int starting_entity_nb = 15;
 
 int mode = FIREWORK_SPAWN; 
-Area area;
+Area area(1,1);
 
 
 
@@ -304,7 +305,7 @@ void init_tile_map() {
   int width = WWIDTH / tile_size;
   int height = WHEIGHT / tile_size;
   int half_tile = tile_size / 2;
-  for(int k = 0; k < area_size; ++k) {
+  for(int k = 0; k < area.width*area.height; ++k) {
     for(int j = 0; j < height; ++j) {
       for(int i = 0; i < width; ++i) {
         Tile& tile = area.tilemaps[k].tiles[width*j+i];

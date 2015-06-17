@@ -36,6 +36,8 @@ void init_entities();
 
 void init_tile_map();
 
+void set_gravity(int ax, int ay);
+
 void respawn();
 
 void apply_gravity();
@@ -59,7 +61,8 @@ extern const int size_factor;
 
 extern const int starting_entity_nb;
 
-extern Area area;
+extern Accel gravity;
+
 
 typedef enum {
   FIXED_BALL_SPAWN = 0,

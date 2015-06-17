@@ -1,4 +1,5 @@
 #include "tile.h"
+#include "entity.h"
 
 Factory<Tile> tile_factory;
 // component factories
@@ -24,24 +25,61 @@ void Tile::remove() {
 }
 
 
-TileMap::TileMap() {
-  nb_tiles = (WWIDTH / tile_size) * (WHEIGHT / tile_size);
-}
-
-
 void TileMap::render() {
   for(int i = 0; i < nb_tiles; ++i) {
     render_tile(tiles[i]);
   }
 }
 
+
 void Area::render() {
-  // todo: only render what is visible
-  for(int i = 0; i < area_size; ++i) {
-    tilemaps[i].render();
+  // TODO: only render what is visible
+  for(int k = 0; k < width*height; ++k) {
+    tilemaps[k].render();
   }
 }
 
 
+Area::Area(int w, int h) {
+  width = w; height = h;
+  printf("creating area of size: %d, %d x %d\n", width*height, width, height);
+  tilemaps[width*height];
+}
+
+
+Tile& Area::get_tile(int tx, int ty) {
+  // find the tilemap
+  int tm_x = tx / screen_width;
+  int tm_y = ty / screen_height;
+  TileMap& tm = tilemaps[tm_y*width + tm_x];
+  // find the tile in this tilemap
+  return tm.tiles[ty*screen_width+tx];
+}
+
+
+Tile& Area::get_tile(const Position& pos) {
+  // find the tilemap
+  int tm_x = pos.x / WWIDTH;
+  int tm_y = pos.y / WHEIGHT;
+  TileMap& tm = tilemaps[tm_y*width + tm_x];
+  // find the tile in this tilemap
+  return tm.tiles[((pos.y%WHEIGHT)/tile_size)*screen_width
+                          +((pos.x%WWIDTH)/tile_size) ];
+}
+
+
+bool Area::valid_map_position(int x, int y, Entity& entity) {
+  // assert mask is not null ?
+  int tile_top_left_X = (x - entity.mask->w / 2) / tile_size;
+  int tile_top_left_Y = (y - entity.mask->h / 2) / tile_size;
+  int tile_bottom_right_X = (x + entity.mask->w / 2) / tile_size;
+  int tile_bottom_right_Y = (y + entity.mask->h / 2) / tile_size;
+  for(int j = tile_top_left_Y; j <= tile_bottom_right_Y; j++) {
+    for(int i = tile_top_left_X; i <= tile_bottom_right_X; i++) {
+      if(get_tile(i, j).flags == SOLID) { return false; }
+    }
+  }
+  return true;
+}
 
 

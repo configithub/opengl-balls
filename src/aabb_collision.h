@@ -16,11 +16,6 @@ public:
   }
 };
 
-void check_collision(Entity& entity);
-
-void do_collision(Entity& entity, Entity& other);
-
-void do_collision_repulse(Entity& entity, Entity& other);
 
 
 #endif

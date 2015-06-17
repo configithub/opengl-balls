@@ -34,21 +34,29 @@ public:
 
 };
 
+
 class TileMap {
 public:
-  TileMap();
+  TileMap() {}
   Tile tiles[(WWIDTH / tile_size) * (WHEIGHT / tile_size)];
-  int nb_tiles;
   void render();
 };
 
 class Area {
 public:
+  Area(int w, int h);
   int width;
   int height;
 
-  TileMap tilemaps[area_size];
+  TileMap tilemaps[];
   void render();
+
+  // in tile coordinates
+  Tile& get_tile(int tx, int ty);
+  // in game position
+  Tile& get_tile(const Position& pos);
+  
+  bool valid_map_position(int x, int y, Entity& entity);
 
 };
 

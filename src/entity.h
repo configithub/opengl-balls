@@ -19,7 +19,8 @@ typedef enum {
   DEAD =  2,
   GHOST = 4,
   GRAVITY_BOUND = 8,
-  EPHEMERAL = 16
+  SPECULATIVE_COLLIDE = 16,
+  EPHEMERAL = 32
 } EN_Flag;
 
 class Entity : public Object {

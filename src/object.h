@@ -27,7 +27,7 @@ public:
     T& obj = objs[nb_obj];
     obj = T();
     obj.id = next_id;
-    printf("adding obj : %d\n", obj.id);
+    // printf("adding obj : %d\n", obj.id);
     ++next_id;
     ++nb_obj;
     return obj;
@@ -35,7 +35,7 @@ public:
 
   void remove(T& obj) {
     if(nb_obj <= 0) { return; }
-    printf("removing obj : %d\n", obj.id);
+    // printf("removing obj : %d\n", obj.id);
     obj.remove();
     obj = objs[nb_obj-1];
     --nb_obj;

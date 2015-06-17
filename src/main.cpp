@@ -9,9 +9,11 @@ const int size_factor = 20;
 
 const int starting_entity_nb = 15;
 
-int mode = FIREWORK_SPAWN; 
+// int mode = FIREWORK_SPAWN; 
+int mode = RANDOM_FALLING_BALL_SPAWN; 
 Area area(1,1);
 
+Accel gravity;
 
 
 void manage_inputs() {
@@ -66,6 +68,18 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     break;
     case SDLK_d:
       remove_random_ball();
+    break;
+    case SDLK_i:
+      set_gravity(0, -2);
+    break;
+    case SDLK_j:
+      set_gravity(-2, 0);
+    break;
+    case SDLK_k:
+      set_gravity(0, 2);
+    break;
+    case SDLK_l:
+      set_gravity(2, 0);
     break;
   }
 }
@@ -328,6 +342,11 @@ void init_tile_map() {
 }
 
 
+void set_gravity(int ax, int ay) {
+  gravity.ax = ax; gravity.ay = ay;
+}
+
+
 void respawn() {
   int entity_nb = entity_factory.nb_obj;
   for (int i = 0; i < entity_nb; ++i) {
@@ -342,7 +361,8 @@ void apply_gravity() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     if(entity.accel == NULL) { continue; }
-    entity.accel->ay = entity.flags & GRAVITY_BOUND ? 2 : 0;
+    entity.accel->ax = entity.flags & GRAVITY_BOUND ? gravity.ax : 0;
+    entity.accel->ay = entity.flags & GRAVITY_BOUND ? gravity.ay : 0;
   }
 }
 
@@ -403,6 +423,7 @@ int main(int argc, char** argv) {
   init_sdl();
   init_entities();
   init_tile_map();
+  set_gravity(0, 2);
   printf("starting pong\n"); 
   loop();
   printf("stopping pong\n");

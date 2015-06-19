@@ -5,11 +5,15 @@
 #include "component.h"
 
 class Entity;
+class Area;
 
 class Position : public Component {
 public:
   int x;
   int y;
+  // speculative position
+  int sx;
+  int sy;
   float theta;
   Position(): x(0), y(0), theta(0.0) {}
 };
@@ -37,6 +41,7 @@ int sgn(int val); // helper function to get the sign of an int
 void update_position(Entity& entity);
 void update_position_angular(Entity& entity);
 void update_position_inertial(Entity& entity);
+void update_position_speculative(Entity& entity, Area& area);
 
 
 #endif

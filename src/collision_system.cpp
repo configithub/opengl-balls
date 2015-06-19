@@ -26,7 +26,12 @@ void check_collision(Entity& entity) {
     if( ox2 < x1 || x2 < ox1 || oy2 < y1 || y2 < oy1 ) {
       continue; // no collision
     }else{ // collision happens
-      do_collision_repulse(entity, other);
+      if(entity.flags & SPECULATIVE_COLLIDE &&
+         other.flags & SPECULATIVE_COLLIDE) {
+        do_collision_speculative(entity, other);
+      }else{
+        do_collision_repulse(entity, other);
+      }
     }
   }
 }
@@ -67,8 +72,8 @@ void do_collision_repulse(Entity& entity, Entity& other) {
   int ox1 = opos.x-ow; int oy1 = opos.y-oh;
   int ox2 = opos.x+ow; int oy2 = opos.y+oh;
   // collision depth, can be negative depending on relative positions
-  int cx = x1 <= ox2 ? (ox2 - x1) : (x2 - ox1); 
-  int cy = y1 <= oy2 ? (oy2 - y1) : (y2 - oy1);
+  int cx = x1 <= ox2 ? (x1 - ox2) : (x2 - ox1); 
+  int cy = y1 <= oy2 ? (y1 - oy2) : (y2 - oy1);
   // repulsion impulse
   int dx = x1 <= ox2 ? 1 : -1; 
   int dy = y1 <= oy2 ? 1 : -1;
@@ -78,6 +83,41 @@ void do_collision_repulse(Entity& entity, Entity& other) {
   }else{
     pos.y += dy*fabs(speed.vy);
     opos.y -= dy*fabs(ospeed.vy);
+  }
+}
+
+
+void do_collision_speculative(Entity& entity, Entity& other) {
+  // elastic collision
+  Speed& speed = *(entity.speed);
+  Speed& ospeed = *(other.speed);
+  int vx = speed.vx;
+  int vy = speed.vy;
+  speed.vx = ospeed.vx;
+  speed.vy = ospeed.vy;
+  ospeed.vx = vx;
+  ospeed.vy = vy;
+  // repulsion to avoid interlock
+  Position& pos = *(entity.position);
+  AABB& mask = *(entity.mask);
+  int w = mask.w/2; int h = mask.h/2;
+  int x1 = pos.x-w; int y1 = pos.y-h;
+  int x2 = pos.x+w; int y2 = pos.y+h;
+  Position& opos = *(other.position);
+  AABB& omask = *(other.mask);
+  int ow = omask.w/2; int oh = omask.h/2;
+  int ox1 = opos.sx-ow; int oy1 = opos.sy-oh;
+  int ox2 = opos.sx+ow; int oy2 = opos.sy+oh;
+  // collision depth, can be negative depending on relative positions
+  int cx = x1 <= ox2 ? (x1 - ox2) : (x2 - ox1); 
+  int cy = y1 <= oy2 ? (y1 - oy2) : (y2 - oy1);
+  // repulsion impulse
+  if(fabs(cx) < fabs(cy)) {
+    pos.sx -= cx / 2;
+    opos.sx += cx / 2;;
+  }else{
+    pos.sy -= cy / 2 ;
+    opos.sy += cy / 2;
   }
 }
 
@@ -92,10 +132,11 @@ void speculative_contact(Entity& entity, Area& area) {
   // if one of the position is not valid, stop there and realize the motion to this position
   // else go to the destination position
   // could be optimized with normal vectors
-  int step_x = entity.speed->vx > 0 ? 1 : (entity.speed->vx < 0 ? -1 : 0);
-  int step_y = entity.speed->vy > 0 ? 1 : (entity.speed->vy < 0 ? -1 : 0);
+  int step_x = entity.position->sx > entity.position->x ? 1 : (entity.position->sx < entity.position->x ? -1 : 0);
+  int step_y = entity.position->sy > entity.position->y ? 1 : (entity.position->sy < entity.position->y ? -1 : 0);
   int speculative_x = entity.position->x;  int speculative_y = entity.position->y;
-  int dist_x = entity.speed->vx;           int dist_y = entity.speed->vy;
+  int dist_x = entity.position->sx - entity.position->x;
+  int dist_y = entity.position->sy - entity.position->y;
   while(true) {
     speculative_x += step_x;
     if(!area.valid_map_position(speculative_x, speculative_y, entity)) {

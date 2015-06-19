@@ -207,7 +207,7 @@ void add_falling_ball() {
   entity.shape->h = size_factor;
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
-  entity.flags = GRAVITY_BOUND;
+  entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE;
   entity.accel->friction = 1;
 }
 
@@ -321,7 +321,8 @@ void init_tile_map() {
     for(int j = 0; j < height; ++j) {
       for(int i = 0; i < width; ++i) {
         Tile& tile = area.tilemaps[k].tiles[width*j+i];
-        tile.flags = (i==0 && j==0) ? SOLID : VOID;
+        tile.flags = (j==0 || j==screen_height-1
+                    || i==0 || i==screen_width-1) ? SOLID : VOID;
         tile.position = tposition_factory.create();       
         // TODO, variable area width and height, for now 3x3
         tile.position->x = (k%3)*width+i*tile_size+half_tile;
@@ -368,7 +369,7 @@ void apply_gravity() {
 void update_positions() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    update_position_inertial(entity);
+    update_position_speculative(entity,area);
   }
 }
 
@@ -377,6 +378,12 @@ void do_collisions() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     check_collision(entity);
+  }
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
+    if(entity.flags & SPECULATIVE_COLLIDE) {
+      speculative_contact(entity, area);
+    }
   }
 }
 

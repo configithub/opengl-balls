@@ -406,7 +406,7 @@ void update_positions() {
 void do_collisions() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    check_collision(entity);
+    check_collision_speculative(entity);
   }
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];

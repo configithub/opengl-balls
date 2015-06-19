@@ -19,4 +19,6 @@ extern int nb_tiles;
 extern int screen_width;
 extern int screen_height;
 
+int sgn(int val); // helper function to get the sign of an int
+
 #endif

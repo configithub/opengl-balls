@@ -26,12 +26,37 @@ void check_collision(Entity& entity) {
     if( ox2 < x1 || x2 < ox1 || oy2 < y1 || y2 < oy1 ) {
       continue; // no collision
     }else{ // collision happens
-      if(entity.flags & SPECULATIVE_COLLIDE &&
-         other.flags & SPECULATIVE_COLLIDE) {
-        do_collision_speculative(entity, other);
-      }else{
-        do_collision_repulse(entity, other);
-      }
+      do_collision_repulse(entity, other);
+    }
+  }
+}
+
+
+void check_collision_speculative(Entity& entity) {
+  if(entity.flags & GHOST) { return; }
+  if(!(entity.flags & SPECULATIVE_COLLIDE)) { check_collision(entity); return; }
+  if ( entity.position == NULL 
+    || entity.mask == NULL) { return; }
+  Position& pos = *(entity.position);
+  AABB& mask = *(entity.mask);
+  if(mask.w == 0 && mask.h == 0) { return; } // ghost object
+  int w = mask.w/2; int h = mask.h/2;
+  int x1 = pos.sx-w; int y1 = pos.sy-h;
+  int x2 = pos.sx+w; int y2 = pos.sy+h;
+  for(int i= 0; i < entity_factory.nb_obj; ++i) {
+    Entity& other = entity_factory.objs[i];
+    if(other.id <= entity.id) { continue; } // prevent self and double collision
+    if ( other.position == NULL 
+      || other.mask == NULL) { continue; }
+    Position& opos = *(other.position);
+    AABB& omask = *(other.mask);
+    int ow = omask.w/2; int oh = omask.h/2;
+    int ox1 = opos.sx-ow; int oy1 = opos.sy-oh;
+    int ox2 = opos.sx+ow; int oy2 = opos.sy+oh;
+    if( ox2 < x1 || x2 < ox1 || oy2 < y1 || y2 < oy1 ) {
+      continue; // no collision
+    }else{ // collision happens
+      do_collision_speculative(entity, other);
     }
   }
 }
@@ -111,7 +136,7 @@ void do_collision_speculative(Entity& entity, Entity& other) {
   // collision depth, can be negative depending on relative positions
   int cx = x1 <= ox2 ? (x1 - ox2) : (x2 - ox1); 
   int cy = y1 <= oy2 ? (y1 - oy2) : (y2 - oy1);
-  // repulsion impulse
+  // repulsion impulse, applied on speculative positions
   if(fabs(cx) < fabs(cy)) {
     pos.sx -= cx / 2;
     opos.sx += cx / 2;;
@@ -132,8 +157,8 @@ void speculative_contact(Entity& entity, Area& area) {
   // if one of the position is not valid, stop there and realize the motion to this position
   // else go to the destination position
   // could be optimized with normal vectors
-  int step_x = entity.position->sx > entity.position->x ? 1 : (entity.position->sx < entity.position->x ? -1 : 0);
-  int step_y = entity.position->sy > entity.position->y ? 1 : (entity.position->sy < entity.position->y ? -1 : 0);
+  int step_x = sgn(entity.position->sx - entity.position->x);
+  int step_y = sgn(entity.position->sy - entity.position->y);
   int speculative_x = entity.position->x;  int speculative_y = entity.position->y;
   int dist_x = entity.position->sx - entity.position->x;
   int dist_y = entity.position->sy - entity.position->y;

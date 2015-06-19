@@ -6,6 +6,8 @@ class Area;
 
 void check_collision(Entity& entity);
 
+void check_collision_speculative(Entity& entity);
+
 void do_collision(Entity& entity, Entity& other);
 
 void do_collision_repulse(Entity& entity, Entity& other);

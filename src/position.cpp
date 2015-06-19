@@ -2,9 +2,6 @@
 #include "entity.h"
 #include "constants.h"
 
-int sgn(int val) {
-  return (0 < val) - (val < 0);
-}
 
 
 void update_position(Entity& entity) {

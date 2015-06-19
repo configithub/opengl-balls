@@ -72,6 +72,8 @@ bool Area::valid_map_position(int x, int y, Entity& entity) {
   // assert mask is not null ?
   int tile_top_left_X = (x - entity.mask->w / 2) / tile_size;
   int tile_top_left_Y = (y - entity.mask->h / 2) / tile_size;
+  tile_top_left_X = tile_top_left_X < 0 ? 0 : tile_top_left_X;
+  tile_top_left_Y = tile_top_left_Y < 0 ? 0 : tile_top_left_Y;
   int tile_bottom_right_X = (x + entity.mask->w / 2) / tile_size;
   int tile_bottom_right_Y = (y + entity.mask->h / 2) / tile_size;
   for(int j = tile_top_left_Y; j <= tile_bottom_right_Y; j++) {

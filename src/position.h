@@ -5,7 +5,6 @@
 #include "component.h"
 
 class Entity;
-class Area;
 
 class Position : public Component {
 public:
@@ -41,7 +40,7 @@ int sgn(int val); // helper function to get the sign of an int
 void update_position(Entity& entity);
 void update_position_angular(Entity& entity);
 void update_position_inertial(Entity& entity);
-void update_position_speculative(Entity& entity, Area& area);
+void update_position_speculative(Entity& entity);
 
 
 #endif

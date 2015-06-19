@@ -369,7 +369,7 @@ void apply_gravity() {
 void update_positions() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    update_position_speculative(entity,area);
+    update_position_speculative(entity);
   }
 }
 

@@ -1,7 +1,5 @@
 #include "position.h"
 #include "entity.h"
-#include "tile.h"
-#include "collision_system.h"
 #include "constants.h"
 
 int sgn(int val) {
@@ -92,7 +90,7 @@ void update_position_inertial(Entity& entity) {
 }
 
 
-void update_position_speculative(Entity& entity, Area& area) {
+void update_position_speculative(Entity& entity) {
   if( entity.accel == NULL ) {
     update_position_angular(entity);
     return;

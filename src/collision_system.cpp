@@ -157,14 +157,14 @@ void do_collision_speculative(Entity& entity, Entity& other) {
 
 void do_collision_speculative_tree(Entity& entity, Entity& other, std::vector<Collision>& collisions) {
   // elastic collision
-  Speed& speed = *(entity.speed);
-  Speed& ospeed = *(other.speed);
-  int vx = speed.vx;
-  int vy = speed.vy;
-  speed.vx = ospeed.vx;
-  speed.vy = ospeed.vy;
-  ospeed.vx = vx;
-  ospeed.vy = vy;
+  //Speed& speed = *(entity.speed);
+  //Speed& ospeed = *(other.speed);
+  //int vx = speed.vx;
+  //int vy = speed.vy;
+  //speed.vx = ospeed.vx;
+  //speed.vy = ospeed.vy;
+  //ospeed.vx = vx;
+  //ospeed.vy = vy;
   // repulsion to avoid interlock
   Position& pos = *(entity.position);
   AABB& mask = *(entity.mask);
@@ -360,8 +360,10 @@ void resolve_collisions_for_rank(std::vector<Collision> collisions, int rank) {
         if(fabs(itCol->cx) > fabs(itCol->cy) /*&& itCol->cy !=0*/) {
           if(itCol->entity->mask->down_rk < itCol->other->mask->down_rk) {
             itCol->other->position->sy += itCol->cy+2;
+            itCol->other->speed->vy = 0;
           }else if(itCol->entity->mask->down_rk > itCol->other->mask->down_rk) {
             itCol->entity->position->sy += itCol->cy+2;
+            itCol->entity->speed->vy = 0;
           }
         }else{
           itCol->other->position->sx += itCol->cx / 2;

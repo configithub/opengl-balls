@@ -156,8 +156,6 @@ void do_collision_speculative(Entity& entity, Entity& other) {
 
 
 void do_collision_speculative_tree(Entity& entity, Entity& other, std::vector<Collision>& collisions) {
-  entity.mask->stand_on = NULL;
-  entity.mask->down_rk = -1;
   // elastic collision
   Speed& speed = *(entity.speed);
   Speed& ospeed = *(other.speed);
@@ -386,6 +384,8 @@ void collision_iteration(Area& area, int it_nb) {
   std::vector<Collision> collisions; 
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
+    entity.mask->down_rk = -1;
+    entity.mask->stand_on = NULL;
     check_collision_speculative(entity, collisions);
   }
   create_collision_tree(collisions);

@@ -323,10 +323,10 @@ void add_contact_tree_ball() {
   entity.position->y = WHEIGHT / 2;
   entity.speed->vx = 0;
   entity.speed->vy = 0;
-  entity.shape->w = size_factor*2;
-  entity.shape->h = size_factor*2;
-  entity.mask->w = size_factor*2;
-  entity.mask->h = size_factor*2;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
   //entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE;
   entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE;
   entity.accel->friction = 1;

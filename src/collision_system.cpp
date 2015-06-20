@@ -156,55 +156,10 @@ void do_collision_speculative(Entity& entity, Entity& other) {
 
 
 void do_collision_speculative_tree(Entity& entity, Entity& other, std::vector<Collision>& collisions) {
-  // elastic collision
-  //Speed& speed = *(entity.speed);
-  //Speed& ospeed = *(other.speed);
-  //int vx = speed.vx;
-  //int vy = speed.vy;
-  //speed.vx = ospeed.vx;
-  //speed.vy = ospeed.vy;
-  //ospeed.vx = vx;
-  //ospeed.vy = vy;
-  // repulsion to avoid interlock
-  Position& pos = *(entity.position);
-  AABB& mask = *(entity.mask);
-  int w = mask.w/2; int h = mask.h/2;
-  int x1 = pos.x-w; int y1 = pos.y-h;
-  int x2 = pos.x+w; int y2 = pos.y+h;
-  Position& opos = *(other.position);
-  AABB& omask = *(other.mask);
-  int ow = omask.w/2; int oh = omask.h/2;
-  int ox1 = opos.sx-ow; int oy1 = opos.sy-oh;
-  int ox2 = opos.sx+ow; int oy2 = opos.sy+oh;
-  // collision depth, can be negative depending on relative positions
-  int cx = pos.x < opos.x ? (x2 - ox1) : (x1 - ox2); 
-  int cy = pos.y < opos.y ? (y2 - oy1) : (y1 - oy2);
-  // repulsion impulse, applied on speculative positions
   Collision col;
   col.entity = &entity;
   col.other = &other;
-  col.cx = cx;
-  col.cy = cy;
   collisions.push_back(col);
-  /*
-  printf("cx: %d, cy: %d\n", cx, cy);
-  if(fabs(cx) < fabs(cy)) {
-    pos.sx -= cx / 2;
-    opos.sx += cx / 2;;
-  }else{
-    printf("%d\n",entity.mask->down_rk);
-    printf("%d\n",other.mask->down_rk);
-    if(entity.mask->down_rk > other.mask->down_rk) {
-      pos.sy -= cy;
-    }else{
-      opos.sy += cy;
-    }
-    if(cy < 0) {
-      other.mask->stand_on = &entity;
-    }else{
-      entity.mask->stand_on = &other;
-    }
-  }*/
 }
 
 
@@ -312,7 +267,7 @@ void create_collision_tree(std::vector<Collision> collisions) {
   for(std::vector<Collision>::iterator itCol = collisions.begin(); 
     itCol != collisions.end(); ++itCol) { 
     if(fabs(itCol->cx) >= fabs(itCol->cy) /*&& itCol->cy !=0*/) {
-      if(itCol->cy < 0) {
+      if(itCol->cy <= 0) {
         // other stands on entity
         itCol->other->mask->stand_on = itCol->entity;
       }else if(itCol->cy >0){

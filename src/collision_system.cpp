@@ -252,8 +252,6 @@ void speculative_contact(Entity& entity, Area& area) {
 void speculative_contact_tree(Entity& entity, Area& area) {
   if(entity.position == NULL || entity.mask == NULL ||
      entity.speed == NULL) { return; }
-  //Point standing_correction = standing_on(entity); // adjust entity position if it stands on something else
-  Point standing_correction;
   
   // check for horizontal collision, for now none of it
   // check all position between current position and destination position step by step
@@ -263,8 +261,8 @@ void speculative_contact_tree(Entity& entity, Area& area) {
   int step_x = sgn(entity.position->sx - entity.position->x);
   int step_y = sgn(entity.position->sy - entity.position->y);
   int speculative_x = entity.position->x;  int speculative_y = entity.position->y;
-  int dist_x = entity.position->sx - standing_correction.x - entity.position->x;
-  int dist_y = entity.position->sy - standing_correction.y - entity.position->y;
+  int dist_x = entity.position->sx - entity.position->x;
+  int dist_y = entity.position->sy - entity.position->y;
   while(true) {
     speculative_x += step_x;
     if(!area.valid_map_position(speculative_x, speculative_y, entity)) {
@@ -287,17 +285,8 @@ void speculative_contact_tree(Entity& entity, Area& area) {
     if(step_x ==0 && step_y == 0) { break; }
   }
   // swap position and speculative position, sx and sy are now the historical coords
-  //printf("a. entity #%d position.sy: %d\n", entity.id, entity.position->sy);
-  //printf("a. entity #%d position.y: %d\n", entity.id, entity.position->y);
-  //printf("a. entity #%d speculative_y: %d\n", entity.id, speculative_y);
-  //printf("b. entity #%d position.sy: %d\n", entity.id, entity.position->sy);
-  //printf("b. entity #%d position.y: %d\n", entity.id, entity.position->y);
-  //printf("b. entity #%d speculative_y: %d\n", entity.id, speculative_y);
   entity.position->x = speculative_x; entity.position->y = speculative_y;
   entity.position->sx = entity.position->x; entity.position->sy = entity.position->y;
-  //printf("c. entity #%d position.sy: %d\n", entity.id, entity.position->sy);
-  //printf("c. entity #%d position.y: %d\n", entity.id, entity.position->y);
-  //printf("c. entity #%d speculative_y: %d\n", entity.id, speculative_y);
 }
 
 
@@ -311,26 +300,24 @@ int calculate_tree_rank(Entity& entity) {
 }
 
 
-Point standing_on(Entity& entity) {
+/*Point standing_on(Entity& entity) {
   Point result;
   if(entity.mask->stand_on != NULL) { // entity is standing on another entity
     result.x = (entity.mask->stand_on->position->x - entity.mask->stand_on->position->sx);
     result.y = (entity.mask->stand_on->position->y - entity.mask->stand_on->position->sy);
-    printf("entity #%d stands on entity #%d\n", entity.id, entity.mask->stand_on->id );
-    printf("entity #%d, standing correction : %d\n", entity.id, (entity.mask->stand_on->position->y - entity.mask->stand_on->position->sy) );
   }
   return result;
-}
+}*/
 
 
 void create_collision_tree(std::vector<Collision> collisions) {
   for(std::vector<Collision>::iterator itCol = collisions.begin(); 
     itCol != collisions.end(); ++itCol) { 
-    if(fabs(itCol->cx) > fabs(itCol->cy) /*&& itCol->cy !=0*/) {
-      if(itCol->cy <= 0) {
+    if(fabs(itCol->cx) >= fabs(itCol->cy) /*&& itCol->cy !=0*/) {
+      if(itCol->cy < 0) {
         // other stands on entity
         itCol->other->mask->stand_on = itCol->entity;
-      }else{
+      }else if(itCol->cy >0){
         // entity stands on other
         itCol->entity->mask->stand_on = itCol->other;
       }
@@ -353,65 +340,37 @@ void Collision::update() {
   // collision depth, can be negative depending on relative positions
   cx = pos.x < opos.x ? (x2 - ox1) : (x1 - ox2); 
   cy = pos.y < opos.y ? (y2 - oy1) : (y1 - oy2);
-  printf("entity: #%d, other: #%d, updating cy: %d\n", entity->id, other->id, cy);
+  // printf("entity: #%d, other: #%d, updating cy: %d\n", entity->id, other->id, cy);
 }
 
 
-void resolve_collisions(std::vector<Collision> collisions) {
-  for(int i = 0; i < collision_resolve_nb; ++i) {
-    // printf("number of collisions: %d\n", collisions.size());
-    for(std::vector<Collision>::iterator itCol = collisions.begin(); 
-      itCol != collisions.end(); ++itCol) { 
-      itCol->update();
-    }
-    for(std::vector<Collision>::iterator itCol = collisions.begin(); 
-      itCol != collisions.end(); ++itCol) { 
-      if(fabs(itCol->cx) > fabs(itCol->cy) /*&& itCol->cy !=0*/) {
-        if(itCol->entity->mask->down_rk < itCol->other->mask->down_rk) {
-          itCol->other->position->sy += itCol->cy;
-        }else{
-          itCol->entity->position->sy += itCol->cy;
-        }
-      }else{
-        itCol->other->position->sx += itCol->cx / 2;
-        itCol->entity->position->sx -= itCol->cx / 2;
-      }
-    }
-  }
-}
-
-
-void resolve_collisions_by_rank(std::vector<Collision> collisions) {
+void resolve_collisions_for_rank(std::vector<Collision> collisions, int rank) {
   for(int i = 0; i < collision_resolve_nb; ++i) {
     std::map<int, std::vector<Collision*> > ranked_cols; 
     for(std::vector<Collision>::iterator itCol = collisions.begin(); 
       itCol != collisions.end(); ++itCol) { 
       int& rk = itCol->entity->mask->down_rk;
       int& ork = itCol->other->mask->down_rk;
-      int col_rk = rk < ork ? rk : ork;
-      ranked_cols[col_rk].push_back(&(*itCol));
-    }  
-    for(std::map<int,std::vector<Collision*> >::iterator itrk = ranked_cols.begin(); 
-      itrk != ranked_cols.end(); ++itrk) { 
-      std::vector<Collision*>& rcollisions = itrk->second; 
-      for(std::vector<Collision*>::iterator itCol = rcollisions.begin(); 
-        itCol != rcollisions.end(); ++itCol) { 
-        (*itCol)->update();
+      itCol->rk = rk < ork ? rk : ork;
+      if(itCol->rk == rank) {
+        itCol->update();
       }
-      for(std::vector<Collision*>::iterator itCol = rcollisions.begin(); 
-        itCol != rcollisions.end(); ++itCol) { 
-        if(fabs((*itCol)->cx) > fabs((*itCol)->cy) /*&& (*itCol)->cy !=0*/) {
-          if((*itCol)->entity->mask->down_rk < (*itCol)->other->mask->down_rk) {
-            (*itCol)->other->position->sy += (*itCol)->cy;
-          }else{
-            (*itCol)->entity->position->sy += (*itCol)->cy;
+    }
+    for(std::vector<Collision>::iterator itCol = collisions.begin(); 
+      itCol != collisions.end(); ++itCol) { 
+      if(itCol->rk == rank) {
+        if(fabs(itCol->cx) > fabs(itCol->cy) /*&& itCol->cy !=0*/) {
+          if(itCol->entity->mask->down_rk < itCol->other->mask->down_rk) {
+            itCol->other->position->sy += itCol->cy+2;
+          }else if(itCol->entity->mask->down_rk > itCol->other->mask->down_rk) {
+            itCol->entity->position->sy += itCol->cy+2;
           }
         }else{
-          (*itCol)->other->position->sx += (*itCol)->cx / 2;
-          (*itCol)->entity->position->sx -= (*itCol)->cx / 2;
+          itCol->other->position->sx += itCol->cx / 2;
+          itCol->entity->position->sx -= itCol->cx / 2;
         }
       }
-    } 
+    }  
   }
 }
 
@@ -438,19 +397,17 @@ void collision_iteration(Area& area, int it_nb) {
       tree[rk].push_back(&entity);
     }
   }
-  //resolve_collisions(collisions);
-  /*for (int i = 0; i < entity_factory.nb_obj; ++i) {
-    Entity& entity = entity_factory.objs[i];
-    speculative_contact_tree(entity, area);
-  }*/
   // rank by rank speculative contact in the tree
   for(std::map<int,std::vector<Entity*> >::iterator itRk = tree.begin(); 
     itRk != tree.end(); ++itRk) { 
     printf("rank %d : %d entities\n", itRk->first, itRk->second.size());
     for(std::vector<Entity*>::iterator itEntity = itRk->second.begin(); 
       itEntity != itRk->second.end(); ++itEntity) { 
-      speculative_contact_tree(**itEntity, area); 
-      resolve_collisions_by_rank(collisions);
+      printf("    rank %d : entity #%d\n", itRk->first, (*itEntity)->id);
+      if((*itEntity)->mask->down_rk == itRk->first) {
+        speculative_contact_tree(**itEntity, area); 
+      }
+      resolve_collisions_for_rank(collisions, itRk->first);
     }  
   } 
 }

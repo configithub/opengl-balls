@@ -12,7 +12,7 @@
 
 #define PI 3.14159265
 
-#define collision_iteration_nb 10
+#define collision_iteration_nb 1
 #define collision_resolve_nb 1
 
 // number of tiles per screen

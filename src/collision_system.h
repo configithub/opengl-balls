@@ -14,6 +14,7 @@ public:
   Entity* other;
   int cx;
   int cy;
+  int rk;
   void update();
   Collision(): entity(NULL), other(NULL), cx(0), cy(0) {}
 };
@@ -36,8 +37,7 @@ void speculative_contact(Entity& entity, Area& area);
 
 void speculative_contact_tree(Entity& entity, Area& area);
 
-
-Point standing_on(Entity& entity);
+//Point standing_on(Entity& entity);
 
 void collision_loop(Area& area);
 
@@ -48,6 +48,8 @@ void create_collision_tree(std::vector<Collision> collisions);
 void resolve_collisions(std::vector<Collision> collisions);
 
 void resolve_collisions_by_rank(std::vector<Collision> collisions);
+
+void resolve_collisions_for_rank(std::vector<Collision> collisions, int rank);
 
 int calculate_tree_rank(Entity& entity);
 

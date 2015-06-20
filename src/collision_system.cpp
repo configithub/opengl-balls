@@ -143,8 +143,6 @@ void do_collision_speculative(Entity& entity, Entity& other) {
   int cx = x1 <= ox2 ? (x1 - ox2) : (x2 - ox1); 
   int cy = y1 <= oy2 ? (y1 - oy2) : (y2 - oy1);
   // repulsion impulse, applied on speculative positions
-  // printf("cx: %d, cy: %d\n", cx, cy);
-  // TODO bug : sometimes cy = -42
   if(fabs(cx) < fabs(cy)) {
     pos.sx -= cx / 2;
     opos.sx += cx / 2;;
@@ -253,20 +251,10 @@ int calculate_tree_rank(Entity& entity) {
 }
 
 
-/*Point standing_on(Entity& entity) {
-  Point result;
-  if(entity.mask->stand_on != NULL) { // entity is standing on another entity
-    result.x = (entity.mask->stand_on->position->x - entity.mask->stand_on->position->sx);
-    result.y = (entity.mask->stand_on->position->y - entity.mask->stand_on->position->sy);
-  }
-  return result;
-}*/
-
-
 void create_collision_tree(std::vector<Collision> collisions) {
   for(std::vector<Collision>::iterator itCol = collisions.begin(); 
     itCol != collisions.end(); ++itCol) { 
-    if(fabs(itCol->cx) >= fabs(itCol->cy) /*&& itCol->cy !=0*/) {
+    if(fabs(itCol->cx) >= fabs(itCol->cy)) {
       if(itCol->cy <= 0) {
         // other stands on entity
         itCol->other->mask->stand_on = itCol->entity;
@@ -293,7 +281,6 @@ void Collision::update() {
   // collision depth, can be negative depending on relative positions
   cx = pos.x < opos.x ? (x2 - ox1) : (x1 - ox2); 
   cy = pos.y < opos.y ? (y2 - oy1) : (y1 - oy2);
-  // printf("entity: #%d, other: #%d, updating cy: %d\n", entity->id, other->id, cy);
 }
 
 
@@ -312,12 +299,12 @@ void resolve_collisions_for_rank(std::vector<Collision> collisions, int rank) {
     for(std::vector<Collision>::iterator itCol = collisions.begin(); 
       itCol != collisions.end(); ++itCol) { 
       if(itCol->rk == rank) {
-        if(fabs(itCol->cx) > fabs(itCol->cy) /*&& itCol->cy !=0*/) {
+        if(fabs(itCol->cx) > fabs(itCol->cy)) {
           if(itCol->entity->mask->down_rk < itCol->other->mask->down_rk) {
-            itCol->other->position->sy += itCol->cy+2;
+            itCol->other->position->sy += itCol->cy;
             itCol->other->speed->vy = 0;
           }else if(itCol->entity->mask->down_rk > itCol->other->mask->down_rk) {
-            itCol->entity->position->sy += itCol->cy+2;
+            itCol->entity->position->sy += itCol->cy;
             itCol->entity->speed->vy = 0;
           }
         }else{
@@ -357,10 +344,10 @@ void collision_iteration(Area& area, int it_nb) {
   // rank by rank speculative contact in the tree
   for(std::map<int,std::vector<Entity*> >::iterator itRk = tree.begin(); 
     itRk != tree.end(); ++itRk) { 
-    printf("rank %d : %d entities\n", itRk->first, itRk->second.size());
+    //printf("rank %d : %d entities\n", itRk->first, itRk->second.size());
     for(std::vector<Entity*>::iterator itEntity = itRk->second.begin(); 
       itEntity != itRk->second.end(); ++itEntity) { 
-      printf("    rank %d : entity #%d\n", itRk->first, (*itEntity)->id);
+      //printf("    rank %d : entity #%d\n", itRk->first, (*itEntity)->id);
       if((*itEntity)->mask->down_rk == itRk->first) {
         speculative_contact_tree(**itEntity, area); 
       }

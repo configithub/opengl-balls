@@ -7,8 +7,8 @@ bool running;
 const int speed_factor = 4;
 const int size_factor = 20;
 
-const int starting_entity_nb = 0;
-//const int starting_entity_nb = 15;
+//const int starting_entity_nb = 0;
+const int starting_entity_nb = 15;
 
 int mode = CONTACT_TREE_BALL_SPAWN; 
 Area area(1,1);
@@ -319,6 +319,8 @@ void add_contact_tree_ball() {
   entity.shape = shape_factory.create();
   entity.mask = mask_factory.create();
   entity.accel = accel_factory.create();
+  //entity.position->x = rand() % WWIDTH;
+  //entity.position->y = rand() % WHEIGHT;
   entity.position->x = WWIDTH / 2;
   entity.position->y = WHEIGHT / 2;
   entity.speed->vx = 0;

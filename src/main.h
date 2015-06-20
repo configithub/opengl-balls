@@ -30,6 +30,8 @@ void add_firework();
 
 void add_specu_colliding_ball();
 
+void add_contact_tree_ball();
+
 void remove_random_ball();
 
 void switch_mode(int val = 1);
@@ -75,6 +77,7 @@ typedef enum {
   RANDOM_ROTATING_BALL_SPAWN,
   RANDOM_FALLING_BALL_SPAWN,
   SPECU_COLLIDING_BALL_SPAWN,
+  CONTACT_TREE_BALL_SPAWN,
   EPHEMERAL_BALL_SPAWN,
   FIREWORK_SPAWN,
   MAX_MODE

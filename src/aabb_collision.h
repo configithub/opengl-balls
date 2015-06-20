@@ -8,12 +8,10 @@ class Entity;
 
 class AABB : public Component { // AABB collision mask
 public:
-  int w;
-  int h;
-  AABB() {
-    w=0;
-    h=0;
-  }
+  int w; int h;
+  int down_rk;
+  Entity* stand_on;
+  AABB(): w(0), h(0), down_rk(-1), stand_on(NULL) {}
 };
 
 

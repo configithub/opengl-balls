@@ -78,6 +78,9 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_r:
       respawn();
     break;
+    case SDLK_c:
+      clear_all();
+    break;
     case SDLK_d:
       remove_random_ball();
     break;
@@ -404,9 +407,11 @@ void set_gravity(int ax, int ay) {
   gravity.ax = ax; gravity.ay = ay;
 }
 
+
 void spawn() {
   init_entities();
 }
+
 
 void respawn() {
   int entity_nb = entity_factory.nb_obj;
@@ -415,6 +420,15 @@ void respawn() {
     entity_factory.remove(entity);
   }
   init_entities();
+}
+
+
+void clear_all() {
+  int entity_nb = entity_factory.nb_obj;
+  for (int i = 0; i < entity_nb; ++i) {
+    Entity& entity = entity_factory.objs[i];
+    entity_factory.remove(entity);
+  }
 }
 
 
@@ -480,7 +494,7 @@ void loop() {
 int main(int argc, char** argv) {
   init_sdl();
   init_entities();
-  //init_tile_map();
+  init_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 
   loop();

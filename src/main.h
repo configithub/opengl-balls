@@ -46,6 +46,8 @@ void spawn();
 
 void respawn();
 
+void clear_all();
+
 void apply_gravity();
 
 void update_positions();

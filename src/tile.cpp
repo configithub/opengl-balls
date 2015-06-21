@@ -44,6 +44,7 @@ Area::Area(int w, int h) {
   width = w; height = h;
   printf("creating area of size: %d, %d x %d\n", width*height, width, height);
   tilemaps[width*height];
+  default_tile.flags = SOLID;
 }
 
 
@@ -51,6 +52,11 @@ Tile& Area::get_tile(int tx, int ty) {
   // find the tilemap
   int tm_x = tx / screen_width;
   int tm_y = ty / screen_height;
+  if(tm_y*width + tm_x >= width*height) {
+    // position is out of area
+    return default_tile;
+  }
+
   TileMap& tm = tilemaps[tm_y*width + tm_x];
   // find the tile in this tilemap
   return tm.tiles[ty*screen_width+tx];

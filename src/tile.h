@@ -49,6 +49,7 @@ public:
   int height;
 
   TileMap tilemaps[];
+  Tile default_tile;
   void render();
 
   // in tile coordinates

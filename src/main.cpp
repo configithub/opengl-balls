@@ -480,7 +480,7 @@ void loop() {
 int main(int argc, char** argv) {
   init_sdl();
   init_entities();
-  init_tile_map();
+  //init_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 
   loop();

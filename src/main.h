@@ -42,6 +42,8 @@ void init_tile_map();
 
 void set_gravity(int ax, int ay);
 
+void spawn();
+
 void respawn();
 
 void apply_gravity();

@@ -72,6 +72,9 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_n:
       switch_mode(-1);
     break;
+    case SDLK_t:
+      spawn();
+    break;
     case SDLK_r:
       respawn();
     break;
@@ -271,26 +274,6 @@ void add_firework() {
   }
 }
 
-/*
-void add_specu_colliding_ball() {
-  Entity& entity = entity_factory.create();
-  entity.position = position_factory.create();
-  entity.speed = speed_factory.create();
-  entity.shape = shape_factory.create();
-  entity.mask = mask_factory.create();
-  entity.accel = accel_factory.create();
-  entity.position->x = rand() % WWIDTH;
-  entity.position->y = rand() % WHEIGHT;
-  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
-  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
-  entity.shape->w = size_factor;
-  entity.shape->h = size_factor;
-  entity.mask->w = size_factor;
-  entity.mask->h = size_factor;
-  entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE;
-  entity.accel->friction = 1;
-}*/
-
 
 void add_specu_colliding_ball() {
   Entity& entity = entity_factory.create();
@@ -303,10 +286,10 @@ void add_specu_colliding_ball() {
   entity.position->y = WHEIGHT / 2;
   entity.speed->vx = 0;
   entity.speed->vy = 0;
-  entity.shape->w = size_factor*2;
-  entity.shape->h = size_factor*2;
-  entity.mask->w = size_factor*2;
-  entity.mask->h = size_factor*2;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
   entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE;
   entity.accel->friction = 1;
 }
@@ -319,8 +302,6 @@ void add_contact_tree_ball() {
   entity.shape = shape_factory.create();
   entity.mask = mask_factory.create();
   entity.accel = accel_factory.create();
-  //entity.position->x = rand() % WWIDTH;
-  //entity.position->y = rand() % WHEIGHT;
   entity.position->x = WWIDTH / 2;
   entity.position->y = WHEIGHT / 2;
   entity.speed->vx = 0;
@@ -329,7 +310,6 @@ void add_contact_tree_ball() {
   entity.shape->h = size_factor;
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
-  //entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE;
   entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE;
   entity.accel->friction = 1;
 }
@@ -424,6 +404,9 @@ void set_gravity(int ax, int ay) {
   gravity.ax = ax; gravity.ay = ay;
 }
 
+void spawn() {
+  init_entities();
+}
 
 void respawn() {
   int entity_nb = entity_factory.nb_obj;
@@ -448,22 +431,12 @@ void apply_gravity() {
 void update_positions() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    update_position_speculative(entity);
+    update_position_inertial(entity);
   }
 }
 
 
 void do_collisions() {
-  /*for (int i = 0; i < entity_factory.nb_obj; ++i) {
-    Entity& entity = entity_factory.objs[i];
-    check_collision_speculative(entity);
-  }
-  for (int i = 0; i < entity_factory.nb_obj; ++i) {
-    Entity& entity = entity_factory.objs[i];
-    if(entity.flags & SPECULATIVE_COLLIDE) {
-      speculative_contact(entity, area);
-    }
-  }*/
   collision_loop(area);
 }
 

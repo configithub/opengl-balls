@@ -44,9 +44,6 @@ public:
 
 
 void update_position(Entity& entity);
-void update_position_angular(Entity& entity);
 void update_position_inertial(Entity& entity);
-void update_position_speculative(Entity& entity);
-
 
 #endif

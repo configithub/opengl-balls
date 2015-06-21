@@ -19,38 +19,39 @@ public:
   Collision(): entity(NULL), other(NULL), cx(0), cy(0) {}
 };
 
-void check_collision(Entity& entity);
-
-void check_collision_speculative(Entity& entity, 
+// used for all entities
+void check_collision(Entity& entity, 
                   std::vector<Collision>& collisions);
 
+// rudimentary collision resolution, not used currently
 void do_collision(Entity& entity, Entity& other);
 
-void do_collision_repulse(Entity& entity, Entity& other);
-
+// used for entities not under contact tree collision mode
 void do_collision_speculative(Entity& entity, Entity& other);
 
+// speculative position value given to true position
+void realize_motion(Entity& entity);
+
+// speculative contact with the tilemap
+void speculative_contact(Entity& entity, Area& area);
+
+// collision objects created for contact tree collisions
 void do_collision_speculative_tree(Entity& entity, Entity& other,
                   std::vector<Collision>& collisions);
 
-void speculative_contact(Entity& entity, Area& area);
+// rank the entity in the contact tree
+int calculate_tree_rank(Entity& entity);
 
-void speculative_contact_tree(Entity& entity, Area& area);
-
-//Point standing_on(Entity& entity);
-
-void collision_loop(Area& area);
-
-void collision_iteration(Area& area, int it_nb);
-
+// propagate the entities' rank to the collisions
 void create_collision_tree(std::vector<Collision> collisions);
 
-void resolve_collisions(std::vector<Collision> collisions);
-
-void resolve_collisions_by_rank(std::vector<Collision> collisions);
-
+// resolve collisions for one given rank
 void resolve_collisions_for_rank(std::vector<Collision> collisions, int rank);
 
-int calculate_tree_rank(Entity& entity);
+// called in main loop
+void collision_loop(Area& area);
+
+// one iteration of the collision system
+void collision_iteration(Area& area, int it_nb);
 
 #endif

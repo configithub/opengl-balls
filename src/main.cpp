@@ -7,9 +7,10 @@ bool running;
 const int speed_factor = 4;
 const int size_factor = 20;
 
+//const int starting_entity_nb = 0;
 const int starting_entity_nb = 15;
 
-int mode = SPECU_COLLIDING_BALL_SPAWN; 
+int mode = CONTACT_TREE_BALL_SPAWN; 
 Area area(1,1);
 
 Accel gravity;
@@ -51,14 +52,17 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
         case RANDOM_FALLING_BALL_SPAWN:
           add_falling_ball();
         break;
+        case SPECU_COLLIDING_BALL_SPAWN:
+          add_specu_colliding_ball();
+        break;
+        case CONTACT_TREE_BALL_SPAWN:
+          add_contact_tree_ball();
+        break;
         case EPHEMERAL_BALL_SPAWN:
           add_ephemeral_ball();
         break;
         case FIREWORK_SPAWN:
           add_firework();
-        break;
-        case SPECU_COLLIDING_BALL_SPAWN:
-          add_specu_colliding_ball();
         break;
       }
     break;
@@ -67,6 +71,9 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     break;
     case SDLK_n:
       switch_mode(-1);
+    break;
+    case SDLK_t:
+      spawn();
     break;
     case SDLK_r:
       respawn();
@@ -275,15 +282,35 @@ void add_specu_colliding_ball() {
   entity.shape = shape_factory.create();
   entity.mask = mask_factory.create();
   entity.accel = accel_factory.create();
-  entity.position->x = rand() % WWIDTH;
-  entity.position->y = rand() % WHEIGHT;
-  entity.speed->vx = rand() % 4*speed_factor - 2*speed_factor;
-  entity.speed->vy = rand() % 4*speed_factor - 2*speed_factor;
+  entity.position->x = WWIDTH / 2;
+  entity.position->y = WHEIGHT / 2;
+  entity.speed->vx = 0;
+  entity.speed->vy = 0;
   entity.shape->w = size_factor;
   entity.shape->h = size_factor;
   entity.mask->w = size_factor;
   entity.mask->h = size_factor;
   entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE;
+  entity.accel->friction = 1;
+}
+
+
+void add_contact_tree_ball() {
+  Entity& entity = entity_factory.create();
+  entity.position = position_factory.create();
+  entity.speed = speed_factory.create();
+  entity.shape = shape_factory.create();
+  entity.mask = mask_factory.create();
+  entity.accel = accel_factory.create();
+  entity.position->x = WWIDTH / 2;
+  entity.position->y = WHEIGHT / 2;
+  entity.speed->vx = 0;
+  entity.speed->vy = 0;
+  entity.shape->w = size_factor;
+  entity.shape->h = size_factor;
+  entity.mask->w = size_factor;
+  entity.mask->h = size_factor;
+  entity.flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE;
   entity.accel->friction = 1;
 }
 
@@ -328,14 +355,17 @@ void init_entities() {
       case RANDOM_FALLING_BALL_SPAWN:
         add_falling_ball();
       break;
+      case SPECU_COLLIDING_BALL_SPAWN:
+        add_specu_colliding_ball();
+      break;
+      case CONTACT_TREE_BALL_SPAWN:
+        add_contact_tree_ball();
+      break;
       case EPHEMERAL_BALL_SPAWN:
         add_ephemeral_ball();
       break;
       case FIREWORK_SPAWN:
         add_firework();
-      break;
-      case SPECU_COLLIDING_BALL_SPAWN:
-        add_specu_colliding_ball();
       break;
     }
   }
@@ -350,8 +380,8 @@ void init_tile_map() {
     for(int j = 0; j < height; ++j) {
       for(int i = 0; i < width; ++i) {
         Tile& tile = area.tilemaps[k].tiles[width*j+i];
-        //tile.flags = (j==0 || j==screen_height-1
-                    //|| i==0 || i==screen_width-1) ? SOLID : VOID;
+        tile.flags = (j==0 || j==screen_height-1
+                    || i==0 || i==screen_width-1) ? SOLID : VOID;
         tile.position = tposition_factory.create();       
         // TODO, variable area width and height, for now 3x3
         tile.position->x = (k%3)*width+i*tile_size+half_tile;
@@ -374,6 +404,9 @@ void set_gravity(int ax, int ay) {
   gravity.ax = ax; gravity.ay = ay;
 }
 
+void spawn() {
+  init_entities();
+}
 
 void respawn() {
   int entity_nb = entity_factory.nb_obj;
@@ -398,22 +431,13 @@ void apply_gravity() {
 void update_positions() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    update_position_speculative(entity);
+    update_position_inertial(entity);
   }
 }
 
 
 void do_collisions() {
-  for (int i = 0; i < entity_factory.nb_obj; ++i) {
-    Entity& entity = entity_factory.objs[i];
-    check_collision_speculative(entity);
-  }
-  for (int i = 0; i < entity_factory.nb_obj; ++i) {
-    Entity& entity = entity_factory.objs[i];
-    if(entity.flags & SPECULATIVE_COLLIDE) {
-      speculative_contact(entity, area);
-    }
-  }
+  collision_loop(area);
 }
 
 

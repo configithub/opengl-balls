@@ -6,6 +6,13 @@
 
 class Entity;
 
+class Point {
+public:
+  Point() : x(0), y(0) {}
+  int x;
+  int y;
+};
+
 class Position : public Component {
 public:
   int x;
@@ -37,9 +44,6 @@ public:
 
 
 void update_position(Entity& entity);
-void update_position_angular(Entity& entity);
 void update_position_inertial(Entity& entity);
-void update_position_speculative(Entity& entity);
-
 
 #endif

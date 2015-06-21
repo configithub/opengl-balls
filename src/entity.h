@@ -20,7 +20,8 @@ typedef enum {
   GHOST = 4,
   GRAVITY_BOUND = 8,
   SPECULATIVE_COLLIDE = 16,
-  EPHEMERAL = 32
+  CONTACT_TREE = 32,
+  EPHEMERAL = 64
 } EN_Flag;
 
 class Entity : public Object {

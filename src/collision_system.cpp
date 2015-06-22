@@ -144,6 +144,7 @@ void do_collision_speculative_tree(Entity& entity, Entity& other,
 
 
 int calculate_tree_rank(Entity& entity) {
+  if(entity.mask->down_rk != -1) { return entity.mask->down_rk; } // perf 
   if(entity.mask->stand_on == NULL) {
     entity.mask->down_rk = 0;
   }else{

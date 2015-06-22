@@ -53,11 +53,11 @@ public:
   void render();
 
   // in tile coordinates
-  Tile& get_tile(int tx, int ty);
+  const Tile& get_tile(int tx, int ty) const;
   // in game position
-  Tile& get_tile(const Position& pos);
+  const Tile& get_tile(const Position& pos) const;
   
-  bool valid_map_position(int x, int y, Entity& entity);
+  bool valid_map_position(int x, int y, Entity& entity) const;
 
 };
 

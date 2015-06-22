@@ -95,7 +95,7 @@ void realize_motion(Entity& entity) {
 }
 
 
-void speculative_contact(Entity& entity, Area& area) {
+void speculative_contact(Entity& entity, const Area& area) {
   if(entity.position == NULL || entity.mask == NULL ||
      entity.speed == NULL) { return; }
   // check all position between current position and destination position step by step
@@ -134,7 +134,8 @@ void speculative_contact(Entity& entity, Area& area) {
 }
 
 
-void do_collision_speculative_tree(Entity& entity, Entity& other, std::vector<Collision>& collisions) {
+void do_collision_speculative_tree(Entity& entity, Entity& other, 
+                              std::vector<Collision>& collisions) {
   Collision col;
   col.entity = &entity;
   col.other = &other;
@@ -152,7 +153,7 @@ int calculate_tree_rank(Entity& entity) {
 }
 
 
-void create_collision_tree(std::vector<Collision> collisions) {
+void create_collision_tree(std::vector<Collision>& collisions) {
   for(std::vector<Collision>::iterator itCol = collisions.begin(); 
     itCol != collisions.end(); ++itCol) { 
     if(fabs(itCol->cx) >= fabs(itCol->cy)) {
@@ -185,35 +186,97 @@ void Collision::update() {
 }
 
 
-void resolve_collisions_for_rank(std::vector<Collision> collisions, int rank) {
+void rank_collisions(std::vector<Collision>& collisions, 
+              std::map<int, std::vector<Collision*> >&  ranked_cols) {
+  for(std::vector<Collision>::iterator itCol = collisions.begin(); 
+    itCol != collisions.end(); ++itCol) { 
+    int& rk = itCol->entity->mask->down_rk;
+    int& ork = itCol->other->mask->down_rk;
+    ranked_cols[rk].push_back(&(*itCol));
+  }
+}
+
+
+void reset_contacts(Entity& entity) {
+  if(entity.mask == NULL) { return; }
+  entity.mask->down_rk = -1;
+  entity.mask->stand_on = NULL;
+}
+
+
+void resolve_collisions_for_one_rank(std::vector<Collision*>& collisions) {
   for(int i = 0; i < collision_resolve_nb; ++i) {
-    for(std::vector<Collision>::iterator itCol = collisions.begin(); 
+    for(std::vector<Collision*>::iterator itCol = collisions.begin(); 
       itCol != collisions.end(); ++itCol) { 
-      int& rk = itCol->entity->mask->down_rk;
-      int& ork = itCol->other->mask->down_rk;
-      itCol->rk = rk < ork ? rk : ork;
-      if(itCol->rk == rank) {
-        itCol->update();
-      }
+      (*itCol)->update();
     }
-    for(std::vector<Collision>::iterator itCol = collisions.begin(); 
+    for(std::vector<Collision*>::iterator itCol = collisions.begin(); 
       itCol != collisions.end(); ++itCol) { 
-      if(itCol->rk == rank) {
-        if(fabs(itCol->cx) > fabs(itCol->cy)) {
-          if(itCol->entity->mask->down_rk < itCol->other->mask->down_rk) {
-            itCol->other->position->sy += itCol->cy;
-            itCol->other->speed->vy = 0;
-          }else if(itCol->entity->mask->down_rk > itCol->other->mask->down_rk) {
-            itCol->entity->position->sy += itCol->cy;
-            itCol->entity->speed->vy = 0;
-          }
-        }else{
-          itCol->other->position->sx += itCol->cx / 2;
-          itCol->entity->position->sx -= itCol->cx / 2;
+      if(fabs((*itCol)->cx) > fabs((*itCol)->cy)) {
+        if((*itCol)->entity->mask->down_rk < (*itCol)->other->mask->down_rk) {
+          (*itCol)->other->position->sy += (*itCol)->cy;
+          (*itCol)->other->speed->vy = 0;
+        }else if((*itCol)->entity->mask->down_rk > (*itCol)->other->mask->down_rk) {
+          (*itCol)->entity->position->sy += (*itCol)->cy;
+          (*itCol)->entity->speed->vy = 0;
         }
+      }else{
+        (*itCol)->other->position->sx += (*itCol)->cx / 2;
+        (*itCol)->entity->position->sx -= (*itCol)->cx / 2;
       }
     }  
   }
+}
+
+
+void resolve_basic_collisions() {
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
+    if(!(entity.flags & SPECULATIVE_COLLIDE)) {
+      // basic entity, just swap position with specu position
+      realize_motion(entity);
+    }
+  }
+}
+
+
+void resolve_speculative_collide_collisions(const Area& area) {
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
+    if((entity.flags & SPECULATIVE_COLLIDE)
+        && !(entity.flags & CONTACT_TREE)) {
+      // speculative position to be tested against the tilemap
+      speculative_contact(entity, area); 
+    }
+  }
+}
+
+
+void resolve_contact_tree_collisions(const Area& area, std::vector<Collision>& collisions) {
+  create_collision_tree(collisions);
+  std::map<int, std::vector<Entity*> > tree;
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
+    if(entity.flags & CONTACT_TREE) {
+      // contact tree entity, will be resolved later in rank by rank fashion
+      int rk = calculate_tree_rank(entity);
+      tree[rk].push_back(&entity);
+    }
+  }
+  // rank the collisions as well
+  std::map<int, std::vector<Collision*> > ranked_cols;
+  rank_collisions(collisions, ranked_cols);
+  // contact tree entity resolution : rank by rank speculative contact in the tree
+  for(std::map<int,std::vector<Entity*> >::iterator itRk = tree.begin(); 
+                                   itRk != tree.end(); ++itRk) { 
+    for(std::vector<Entity*>::iterator itEntity = itRk->second.begin(); 
+      itEntity != itRk->second.end(); ++itEntity) { 
+      // speculative position to be tested against the tilemap, lower rank first
+      speculative_contact(**itEntity, area); 
+      // resolve collisions for this rank, push the next rank
+      resolve_collisions_for_one_rank(ranked_cols[itRk->first]);
+    }  
+  } 
 }
 
 
@@ -229,39 +292,11 @@ void collision_iteration(Area& area, int it_nb) {
   std::vector<Collision> collisions; 
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    entity.mask->down_rk = -1;
-    entity.mask->stand_on = NULL;
+    reset_contacts(entity);
     check_collision(entity, collisions);
   }
   // resolve collision according to collision mode
-  create_collision_tree(collisions);
-  std::map<int, std::vector<Entity*> > tree;
-  for (int i = 0; i < entity_factory.nb_obj; ++i) {
-    Entity& entity = entity_factory.objs[i];
-    if(entity.flags & CONTACT_TREE) {
-      // contact tree entity, will be resolved later in rank by rank fashion
-      int rk = calculate_tree_rank(entity);
-      tree[rk].push_back(&entity);
-    }else if(entity.flags & SPECULATIVE_COLLIDE) {
-      // speculative collide entity with no contact tree 
-      // speculative position to be tested against the tilemap
-      speculative_contact(entity, area); 
-    }else{
-      // basic entity, just swap position with specu position
-      realize_motion(entity);
-    }
-  }
-  // contact tree entity resolution : rank by rank speculative contact in the tree
-  for(std::map<int,std::vector<Entity*> >::iterator itRk = tree.begin(); 
-    itRk != tree.end(); ++itRk) { 
-    for(std::vector<Entity*>::iterator itEntity = itRk->second.begin(); 
-      itEntity != itRk->second.end(); ++itEntity) { 
-      if((*itEntity)->mask->down_rk == itRk->first) {
-        // speculative position to be tested against the tilemap, lower rank first
-        speculative_contact(**itEntity, area); 
-      }
-      // resolve collisions for this rank, push the next rank
-      resolve_collisions_for_rank(collisions, itRk->first);
-    }  
-  } 
+  resolve_basic_collisions();
+  resolve_speculative_collide_collisions(area);
+  resolve_contact_tree_collisions(area, collisions);
 }

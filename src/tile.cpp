@@ -48,7 +48,7 @@ Area::Area(int w, int h) {
 }
 
 
-Tile& Area::get_tile(int tx, int ty) {
+const Tile& Area::get_tile(int tx, int ty) const {
   // find the tilemap
   int tm_x = tx / screen_width;
   int tm_y = ty / screen_height;
@@ -57,24 +57,24 @@ Tile& Area::get_tile(int tx, int ty) {
     return default_tile;
   }
 
-  TileMap& tm = tilemaps[tm_y*width + tm_x];
+  const TileMap& tm = tilemaps[tm_y*width + tm_x];
   // find the tile in this tilemap
   return tm.tiles[ty*screen_width+tx];
 }
 
 
-Tile& Area::get_tile(const Position& pos) {
+const Tile& Area::get_tile(const Position& pos) const {
   // find the tilemap
   int tm_x = pos.x / WWIDTH;
   int tm_y = pos.y / WHEIGHT;
-  TileMap& tm = tilemaps[tm_y*width + tm_x];
+  const TileMap& tm = tilemaps[tm_y*width + tm_x];
   // find the tile in this tilemap
   return tm.tiles[((pos.y%WHEIGHT)/tile_size)*screen_width
                           +((pos.x%WWIDTH)/tile_size) ];
 }
 
 
-bool Area::valid_map_position(int x, int y, Entity& entity) {
+bool Area::valid_map_position(int x, int y, Entity& entity) const {
   // assert mask is not null ?
   int tile_top_left_X = (x - entity.mask->w / 2) / tile_size;
   int tile_top_left_Y = (y - entity.mask->h / 2) / tile_size;

@@ -11,10 +11,8 @@ class Point;
 
 class Collision {
 public:
-  Entity* entity;
-  Entity* other;
-  int cx;
-  int cy;
+  Entity* entity; Entity* other;
+  int cx; int cy;
   void update();
   Collision(): entity(NULL), other(NULL), cx(0), cy(0) {}
 };
@@ -29,15 +27,15 @@ void do_collision(Entity& entity, Entity& other);
 // used for entities not under contact tree collision mode
 void do_collision_speculative(Entity& entity, Entity& other);
 
+// collision objects created for contact tree collisions
+void do_collision_speculative_tree(Entity& entity, Entity& other,
+                  std::vector<Collision>& collisions);
+
 // speculative position value given to true position
 void realize_motion(Entity& entity);
 
 // speculative contact with the tilemap
 void speculative_contact(Entity& entity, const Area& area);
-
-// collision objects created for contact tree collisions
-void do_collision_speculative_tree(Entity& entity, Entity& other,
-                  std::vector<Collision>& collisions);
 
 // rank the entity in the contact tree
 int calculate_tree_rank(Entity& entity);
@@ -53,7 +51,7 @@ void rank_collisions(const std::vector<Collision>& collisions,
 void reset_contacts(Entity& entity);
 
 // resolve collisions for one given rank
-void resolve_collisions_for_one_rank(std::vector<Collision*>& collisions);
+void resolve_collisions_for_one_rank(const std::vector<Collision*>& collisions);
 
 // swap speculative positions with positions for all entities
 void resolve_basic_collisions();
@@ -65,9 +63,6 @@ void resolve_speculative_collide_collisions(const Area& area);
 void resolve_contact_tree_collisions(const Area& area, std::vector<Collision>& collisions);
 
 // called in main loop
-void collision_loop(Area& area);
-
-// one iteration of the collision system
-void collision_iteration(Area& area, int it_nb);
+void collision_loop(const Area& area);
 
 #endif

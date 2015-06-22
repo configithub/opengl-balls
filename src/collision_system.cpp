@@ -204,13 +204,13 @@ void reset_contacts(Entity& entity) {
 }
 
 
-void resolve_collisions_for_one_rank(std::vector<Collision*>& collisions) {
+void resolve_collisions_for_one_rank(const std::vector<Collision*>& collisions) {
   for(int i = 0; i < collision_resolve_nb; ++i) {
-    for(std::vector<Collision*>::iterator itCol = collisions.begin(); 
+    for(std::vector<Collision*>::const_iterator itCol = collisions.begin(); 
       itCol != collisions.end(); ++itCol) { 
       (*itCol)->update();
     }
-    for(std::vector<Collision*>::iterator itCol = collisions.begin(); 
+    for(std::vector<Collision*>::const_iterator itCol = collisions.begin(); 
       itCol != collisions.end(); ++itCol) { 
       if(fabs((*itCol)->cx) > fabs((*itCol)->cy)) {
         if((*itCol)->entity->mask->down_rk < (*itCol)->other->mask->down_rk) {
@@ -280,14 +280,7 @@ void resolve_contact_tree_collisions(const Area& area, std::vector<Collision>& c
 }
 
 
-void collision_loop(Area& area) {
-  for(int i = 0; i < collision_iteration_nb; ++i) {
-    collision_iteration(area, i);
-  }
-}
-
-
-void collision_iteration(Area& area, int it_nb) {
+void collision_loop(const Area& area) {
   // check for entity collisions
   std::vector<Collision> collisions; 
   for (int i = 0; i < entity_factory.nb_obj; ++i) {

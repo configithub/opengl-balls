@@ -40,6 +40,10 @@ void init_entities();
 
 void init_tile_map();
 
+void clear_tile_map();
+
+void set_square_tile_map();
+
 void set_gravity(int ax, int ay);
 
 void spawn();
@@ -69,8 +73,10 @@ extern const int size_factor;
 
 extern const int starting_entity_nb;
 
-extern Accel gravity;
+extern bool tile_map_active;
 
+extern Accel gravity;
+extern Area area;
 
 typedef enum {
   FIXED_BALL_SPAWN = 0,

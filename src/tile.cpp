@@ -1,7 +1,6 @@
 #include "tile.h"
 #include "entity.h"
 
-Factory<Tile> tile_factory;
 // component factories
 ComponentFactory<Position> tposition_factory;
 ComponentFactory<Rectangle> tshape_factory;
@@ -26,35 +25,40 @@ void Tile::remove() {
 
 
 void TileMap::render() {
-  for(int i = 0; i < nb_tiles; ++i) {
-    render_tile(tiles[i]);
-  }
+  for(std::vector<Tile>::iterator itt = tiles.begin(); 
+    itt != tiles.end(); ++itt) { 
+    render_tile(*itt);
+  }  
 }
 
 
 void Area::render() {
   // TODO: only render what is visible
-  for(int k = 0; k < width*height; ++k) {
-    tilemaps[k].render();
-  }
+  for(std::vector<TileMap>::iterator ittm = tilemaps.begin(); 
+    ittm != tilemaps.end(); ++ittm) { 
+    ittm->render();
+  }  
 }
 
 
 Area::Area(int w, int h) {
   width = w; height = h;
   printf("creating area of size: %d, %d x %d\n", width*height, width, height);
-  tilemaps[width*height];
-  default_tile.flags = SOLID;
+  tilemaps.reserve(width*height);
+  default_solid_tile.flags = SOLID;
+  default_void_tile.flags = VOID;
 }
 
 
 const Tile& Area::get_tile(int tx, int ty) const {
+  if(tilemaps.empty()) { return default_void_tile; }
   // find the tilemap
   int tm_x = tx / screen_width;
   int tm_y = ty / screen_height;
   if(tm_y*width + tm_x >= width*height) {
     // position is out of area
-    return default_tile;
+    return default_solid_tile;
+    printf("fall back on default solid tile\n");
   }
 
   const TileMap& tm = tilemaps[tm_y*width + tm_x];
@@ -64,6 +68,7 @@ const Tile& Area::get_tile(int tx, int ty) const {
 
 
 const Tile& Area::get_tile(const Position& pos) const {
+  if(tilemaps.empty()) { return default_solid_tile; }
   // find the tilemap
   int tm_x = pos.x / WWIDTH;
   int tm_y = pos.y / WHEIGHT;

@@ -1,6 +1,8 @@
 #ifndef _TILE_H_
 #define _TILE_H_
 
+#include <vector>
+
 #include "object.h"
 #include "component.h"
 
@@ -31,6 +33,7 @@ public:
             shape(NULL), mask(NULL) {};
 
   void remove();
+  void set_void();
 
 };
 
@@ -38,7 +41,7 @@ public:
 class TileMap {
 public:
   TileMap() {}
-  Tile tiles[(WWIDTH / tile_size) * (WHEIGHT / tile_size)];
+  std::vector<Tile> tiles;
   void render();
 };
 
@@ -48,8 +51,9 @@ public:
   int width;
   int height;
 
-  TileMap tilemaps[];
-  Tile default_tile;
+  std::vector<TileMap> tilemaps;
+  Tile default_void_tile;
+  Tile default_solid_tile;
   void render();
 
   // in tile coordinates
@@ -61,6 +65,5 @@ public:
 
 };
 
-extern Factory<Tile> tile_factory;
 
 #endif

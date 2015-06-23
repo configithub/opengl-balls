@@ -193,7 +193,8 @@ void rank_collisions(std::vector<Collision>& collisions,
     itCol != collisions.end(); ++itCol) { 
     int& rk = itCol->entity->mask->down_rk;
     int& ork = itCol->other->mask->down_rk;
-    ranked_cols[rk].push_back(&(*itCol));
+    int col_rk = rk < ork ? rk : ork;
+    ranked_cols[col_rk].push_back(&(*itCol));
   }
 }
 
@@ -253,7 +254,8 @@ void resolve_speculative_collide_collisions(const Area& area) {
 }
 
 
-void resolve_contact_tree_collisions(const Area& area, std::vector<Collision>& collisions) {
+void resolve_contact_tree_collisions(const Area& area,
+                           std::vector<Collision>& collisions) {
   create_collision_tree(collisions);
   std::map<int, std::vector<Entity*> > tree;
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
@@ -270,7 +272,7 @@ void resolve_contact_tree_collisions(const Area& area, std::vector<Collision>& c
   // contact tree entity resolution : rank by rank speculative contact in the tree
   for(std::map<int,std::vector<Entity*> >::iterator itRk = tree.begin(); 
                                    itRk != tree.end(); ++itRk) { 
-    for(std::vector<Entity*>::iterator itEntity = itRk->second.begin(); 
+    for(std::vector<Entity*>::const_iterator itEntity = itRk->second.begin(); 
       itEntity != itRk->second.end(); ++itEntity) { 
       // speculative position to be tested against the tilemap, lower rank first
       speculative_contact(**itEntity, area); 
@@ -289,7 +291,7 @@ void collision_loop(const Area& area) {
     reset_contacts(entity);
     check_collision(entity, collisions);
   }
-  // resolve collision according to collision mode
+  // resolve collisions according to collision modes
   resolve_basic_collisions();
   resolve_speculative_collide_collisions(area);
   resolve_contact_tree_collisions(area, collisions);

@@ -21,7 +21,8 @@ void render(Entity& entity) {
 
 void render_tile(Tile& tile) {
   if ( tile.position == NULL 
-    || tile.shape == NULL) { return; }
+    || tile.shape == NULL
+    || tile.flags == VOID) { return; }
   Position& pos = *(tile.position);
   Rectangle& rect = *(tile.shape);
   int w = rect.w/2; int h = rect.h/2;

@@ -7,6 +7,8 @@ bool running;
 const int speed_factor = 4;
 const int size_factor = 20;
 
+bool tile_map_active = true;
+
 //const int starting_entity_nb = 0;
 const int starting_entity_nb = 15;
 
@@ -81,6 +83,13 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_c:
       clear_all();
     break;
+    case SDLK_a:
+      if(tile_map_active) {
+        clear_tile_map();
+      }else{
+        set_square_tile_map();
+      }
+    break;
     case SDLK_d:
       remove_random_ball();
     break;
@@ -95,6 +104,9 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     break;
     case SDLK_l:
       set_gravity(2, 0);
+    break;
+    case SDLK_o:
+      set_gravity(0, 0);
     break;
   }
 }
@@ -376,19 +388,21 @@ void init_entities() {
 
 
 void init_tile_map() {
+  printf("initializing tilemap\n");
   int width = WWIDTH / tile_size;
   int height = WHEIGHT / tile_size;
   int half_tile = tile_size / 2;
   for(int k = 0; k < area.width*area.height; ++k) {
+    TileMap tm;
+    tm.tiles.reserve(height*width);
     for(int j = 0; j < height; ++j) {
       for(int i = 0; i < width; ++i) {
-        Tile& tile = area.tilemaps[k].tiles[width*j+i];
+        Tile tile;
         tile.flags = (j==0 || j==screen_height-1
                     || i==0 || i==screen_width-1) ? SOLID : VOID;
         tile.position = tposition_factory.create();       
-        // TODO, variable area width and height, for now 3x3
-        tile.position->x = (k%3)*width+i*tile_size+half_tile;
-        tile.position->y = (k/3)*height+j*tile_size+half_tile;
+        tile.position->x = (k%area.width)*width+i*tile_size+half_tile;
+        tile.position->y = (k/area.width)*height+j*tile_size+half_tile;
         if(tile.flags == SOLID) { 
           tile.shape = tshape_factory.create();       
           tile.mask = tmask_factory.create();       
@@ -397,14 +411,51 @@ void init_tile_map() {
           tile.mask->w = tile_size;
           tile.mask->h = tile_size;
         }
+        tm.tiles.push_back(tile);
+      }
+    } 
+    area.tilemaps.push_back(tm);
+  }
+  tile_map_active = true;
+}
+
+
+void clear_tile_map() {
+  printf("clearing tilemap\n");
+  int width = WWIDTH / tile_size;
+  int height = WHEIGHT / tile_size;
+  for(int k = 0; k < area.width*area.height; ++k) {
+    for(int j = 0; j < height; ++j) {
+      for(int i = 0; i < width; ++i) {
+        Tile& tile = area.tilemaps[k].tiles[width*j+i];
+        tile.flags = VOID;
       }
     } 
   }
+  tile_map_active = false;
+}
+
+
+void set_square_tile_map() {
+  printf("setting tilemap\n");
+  int width = WWIDTH / tile_size;
+  int height = WHEIGHT / tile_size;
+  for(int k = 0; k < area.width*area.height; ++k) {
+    for(int j = 0; j < height; ++j) {
+      for(int i = 0; i < width; ++i) {
+        Tile& tile = area.tilemaps[k].tiles[width*j+i];
+        tile.flags = (j==0 || j==screen_height-1
+                   || i==0 || i==screen_width-1) ? SOLID : VOID;
+      }
+    } 
+  }
+  tile_map_active = true;
 }
 
 
 void set_gravity(int ax, int ay) {
   gravity.ax = ax; gravity.ay = ay;
+  printf("gravity set to (%d, %d)\n", (int)gravity.ax, (int)gravity.ay);
 }
 
 
@@ -456,7 +507,8 @@ void do_collisions() {
 
 
 void do_render() {
-  area.render();
+  area.render(); 
+  //if(tile_map_active) { area.render(); }
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     render_rotated(entity);

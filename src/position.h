@@ -43,6 +43,7 @@ public:
 };
 
 
+void update_position_ghost(Entity& entity);
 void update_position(Entity& entity);
 void update_position_inertial(Entity& entity);
 

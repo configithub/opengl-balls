@@ -13,9 +13,9 @@ bool tile_map_active = true;
 const int starting_entity_nb = 15;
 
 int mode = CONTACT_TREE_BALL_SPAWN; 
-Area area(1,1);
-
+Area area(2,1);
 Accel gravity;
+Entity camera;
 
 
 void manage_inputs() {
@@ -24,6 +24,9 @@ void manage_inputs() {
       running = false;
     if(events.type ==  SDL_KEYUP) 
       key_up(events.key.keysym.sym,events.key.keysym.mod,
+                       events.key.keysym.unicode);
+    if(events.type ==  SDL_KEYDOWN) 
+      key_down(events.key.keysym.sym,events.key.keysym.mod,
                        events.key.keysym.unicode);
   }
 }
@@ -83,14 +86,14 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_c:
       clear_all();
     break;
-    case SDLK_a:
+    case SDLK_y:
       if(tile_map_active) {
         clear_tile_map();
       }else{
         set_square_tile_map();
       }
     break;
-    case SDLK_d:
+    case SDLK_u:
       remove_random_ball();
     break;
     case SDLK_i:
@@ -109,6 +112,41 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
       set_gravity(0, 0);
     break;
   }
+}
+
+
+void key_down(SDLKey sym, SDLMod mod, Uint16 unicode) { 
+  switch(sym) {
+    case SDLK_w:
+      camera.accel->ay = -0.2;
+    break;
+    case SDLK_a:
+      camera.accel->ax = -0.2;
+    break;
+    case SDLK_s:
+      camera.accel->ay = 0.2;
+    break;
+    case SDLK_d:
+      camera.accel->ax = 0.2;
+    break;
+  }
+}
+
+
+void init_camera() {
+  camera.position = position_factory.create();
+  camera.speed = speed_factory.create();
+  camera.accel = accel_factory.create();
+  camera.shape = shape_factory.create();
+  //camera.mask = mask_factory.create();
+  camera.position->x = 15;
+  camera.position->y = 0;
+  camera.shape->w = WWIDTH;
+  camera.shape->h = WHEIGHT;
+  //camera.mask->w = WWIDTH;
+  //camera.mask->h = WHEIGHT;
+  camera.flags = GHOST;
+  camera.accel->friction = 1;
 }
 
 
@@ -399,10 +437,10 @@ void init_tile_map() {
       for(int i = 0; i < width; ++i) {
         Tile tile;
         tile.flags = (j==0 || j==screen_height-1
-                    || i==0 || i==screen_width-1) ? SOLID : VOID;
+                   || i==0 || i==screen_width-1) ? SOLID : VOID;
         tile.position = tposition_factory.create();       
-        tile.position->x = (k%area.width)*width+i*tile_size+half_tile;
-        tile.position->y = (k/area.width)*height+j*tile_size+half_tile;
+        tile.position->x = ((k%area.width)*width+i)*tile_size+half_tile;
+        tile.position->y = ((k/area.width)*height+j)*tile_size+half_tile;
         if(tile.flags == SOLID) { 
           tile.shape = tshape_factory.create();       
           tile.mask = tmask_factory.create();       
@@ -494,6 +532,8 @@ void apply_gravity() {
 
 
 void update_positions() {
+  update_position_inertial(camera);
+  realize_motion(camera);
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     update_position_inertial(entity);
@@ -507,11 +547,10 @@ void do_collisions() {
 
 
 void do_render() {
-  area.render(); 
-  //if(tile_map_active) { area.render(); }
+  area.render(camera); 
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    render_rotated(entity);
+    render_rotated(entity, camera);
   }
 }
 
@@ -545,6 +584,7 @@ void loop() {
 
 int main(int argc, char** argv) {
   init_sdl();
+  init_camera();
   init_entities();
   init_tile_map();
   set_gravity(0, 2);

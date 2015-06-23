@@ -42,7 +42,7 @@ class TileMap {
 public:
   TileMap() {}
   std::vector<Tile> tiles;
-  void render();
+  void render(const Entity& camera);
 };
 
 class Area {
@@ -54,7 +54,7 @@ public:
   std::vector<TileMap> tilemaps;
   Tile default_void_tile;
   Tile default_solid_tile;
-  void render();
+  void render(const Entity& camera);
 
   // in tile coordinates
   const Tile& get_tile(int tx, int ty) const;

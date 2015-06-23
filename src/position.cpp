@@ -3,6 +3,23 @@
 #include "constants.h"
 
 
+void update_position_ghost(Entity& entity) {
+  if( entity.position == NULL 
+   || entity.speed == NULL
+   || entity.accel == NULL) { return; }
+  Position& pos = *(entity.position);
+  Speed& speed = *(entity.speed);
+  Accel& accel = *(entity.accel);
+  pos.sx = pos.x; pos.sy = pos.y;
+  speed.vx += accel.ax - sgn(speed.vx)*accel.friction;
+  speed.vy += accel.ay - sgn(speed.vy)*accel.friction;
+  pos.sx += speed.vx;
+  pos.sy += speed.vy;
+  // do realize motion now, as there is no collision anyway
+  pos.x = pos.sx; pos.y = pos.sy;
+}
+
+
 void update_position(Entity& entity) {
   if( entity.position == NULL 
    || entity.speed == NULL
@@ -30,14 +47,16 @@ void update_position(Entity& entity) {
 
 
 void update_position_inertial(Entity& entity) {
-  if( entity.accel == NULL ) {
+  if(entity.accel == NULL &&
+     entity.mask != NULL) {
     update_position(entity);
     return;
-  }
-  if( entity.position == NULL 
+  }else if(entity.mask == NULL) {
+    update_position_ghost(entity);
+    return;
+  }else if(entity.position == NULL 
    || entity.speed == NULL
-   || entity.accel == NULL
-   || entity.mask == NULL) { return; }
+   || entity.accel == NULL) { return; }
   Position& pos = *(entity.position);
   Speed& speed = *(entity.speed);
   Accel& accel = *(entity.accel);

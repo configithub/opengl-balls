@@ -7,35 +7,35 @@
 
 Rectangle rectangles[max_entity_nb];
 
-void render(Entity& entity) {
+void render(Entity& entity, const Entity& camera) {
   if ( entity.position == NULL 
     || entity.shape == NULL) { return; }
   Position& pos = *(entity.position);
   Rectangle& rect = *(entity.shape);
   int w = rect.w/2; int h = rect.h/2;
-  draw_hollow_square(pos.x-w, pos.y-h,
-                     pos.x+w, pos.y-h,
-                     pos.x+w, pos.y+h,
-                     pos.x-w, pos.y+h);
+  draw_hollow_square(pos.x-w - camera.position->x, pos.y-h - camera.position->y,
+                     pos.x+w - camera.position->x, pos.y-h - camera.position->y,
+                     pos.x+w - camera.position->x, pos.y+h - camera.position->y,
+                     pos.x-w - camera.position->x, pos.y+h - camera.position->y);
 }
 
-void render_tile(Tile& tile) {
+void render_tile(Tile& tile, const Entity& camera) {
   if ( tile.position == NULL 
     || tile.shape == NULL
     || tile.flags == VOID) { return; }
   Position& pos = *(tile.position);
   Rectangle& rect = *(tile.shape);
   int w = rect.w/2; int h = rect.h/2;
-  draw_square(pos.x-w, pos.y-h,
-              pos.x+w, pos.y-h,
-              pos.x+w, pos.y+h,
-              pos.x-w, pos.y+h);
+  draw_square(pos.x-w - camera.position->x, pos.y-h - camera.position->y,
+              pos.x+w - camera.position->x, pos.y-h - camera.position->y,
+              pos.x+w - camera.position->x, pos.y+h - camera.position->y,
+              pos.x-w - camera.position->x, pos.y+h - camera.position->y);
 }
 
-void render_rotated(Entity& entity) {
+void render_rotated(Entity& entity, const Entity& camera) {
   if ( entity.position == NULL 
     || entity.shape == NULL) { return; }
-  if ( entity.position->theta == 0 ) { render(entity); return; }
+  if ( entity.position->theta == 0 ) { render(entity, camera); return; }
   Position& pos = *(entity.position);
   Rectangle& rect = *(entity.shape);
   int w = rect.w/2; int h = rect.h/2;
@@ -45,10 +45,11 @@ void render_rotated(Entity& entity) {
   int h_r_a = (int) (-w*sin_theta + h*cos_theta + 0.5);
   int w_r_b = (int) (-w*cos_theta + h*sin_theta + 0.5);
   int h_r_b = (int) (w*sin_theta + h*cos_theta + 0.5);
-  draw_hollow_square(pos.x-w_r_a, pos.y-h_r_a,
-                     pos.x-w_r_b, pos.y-h_r_b,
-                     pos.x+w_r_a, pos.y+h_r_a,
-                     pos.x+w_r_b, pos.y+h_r_b);
+  draw_hollow_square(pos.x-w_r_a - camera.position->x, 
+                                        pos.y-h_r_a - camera.position->y,
+              pos.x-w_r_b - camera.position->x, pos.y-h_r_b - camera.position->y,
+              pos.x+w_r_a - camera.position->x, pos.y+h_r_a - camera.position->y,
+              pos.x+w_r_b - camera.position->x, pos.y+h_r_b - camera.position->y);
 }
 
 

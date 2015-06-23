@@ -14,9 +14,9 @@ public:
   Rectangle(): w(0), h(0) {}
 };
 
-void render(Entity& entity);
-void render_tile(Tile& tile);
-void render_rotated(Entity& entity);
+void render(Entity& entity, const Entity& camera);
+void render_tile(Tile& tile, const Entity& camera);
+void render_rotated(Entity& entity, const Entity& camera);
 
 
 #endif

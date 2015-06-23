@@ -10,6 +10,10 @@ void manage_inputs();
 
 void key_up(SDLKey sym, SDLMod mod, Uint16 unicode);
 
+void key_down(SDLKey sym, SDLMod mod, Uint16 unicode);
+
+void init_camera();
+
 void add_ball();
 
 void add_random_ball();
@@ -77,6 +81,8 @@ extern bool tile_map_active;
 
 extern Accel gravity;
 extern Area area;
+
+extern Entity camera;
 
 typedef enum {
   FIXED_BALL_SPAWN = 0,

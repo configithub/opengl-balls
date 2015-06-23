@@ -24,19 +24,19 @@ void Tile::remove() {
 }
 
 
-void TileMap::render() {
+void TileMap::render(const Entity& camera) {
   for(std::vector<Tile>::iterator itt = tiles.begin(); 
     itt != tiles.end(); ++itt) { 
-    render_tile(*itt);
+    render_tile(*itt, camera);
   }  
 }
 
 
-void Area::render() {
+void Area::render(const Entity& camera) {
   // TODO: only render what is visible
   for(std::vector<TileMap>::iterator ittm = tilemaps.begin(); 
     ittm != tilemaps.end(); ++ittm) { 
-    ittm->render();
+    ittm->render(camera);
   }  
 }
 

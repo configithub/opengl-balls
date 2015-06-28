@@ -47,4 +47,6 @@ void update_position_ghost(Entity& entity);
 void update_position(Entity& entity);
 void update_position_inertial(Entity& entity);
 
+void cap_speed(Entity& entity, const int& cap);
+
 #endif

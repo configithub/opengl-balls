@@ -21,7 +21,8 @@ typedef enum {
   GRAVITY_BOUND = 8,
   SPECULATIVE_COLLIDE = 16,
   CONTACT_TREE = 32,
-  EPHEMERAL = 64
+  PLAYER = 64,
+  EPHEMERAL = 128
 } EN_Flag;
 
 class Entity : public Object {

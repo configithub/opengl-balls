@@ -1,6 +1,7 @@
 #include "position.h"
 #include "entity.h"
 #include "constants.h"
+#include "math.h"
 
 
 void update_position_ghost(Entity& entity) {
@@ -80,3 +81,12 @@ void update_position_inertial(Entity& entity) {
   pos.theta += speed.omega;
   pos.theta = pos.theta > 2*PI ? pos.theta - 2*PI : pos.theta;
 }
+
+
+void cap_speed(Entity& entity, const int& cap) {
+  Speed& speed = *(entity.speed);
+  speed.vx = fabs(speed.vx) > cap ? sgn(speed.vx)*cap : speed.vx;
+  speed.vy = fabs(speed.vy) > cap ? sgn(speed.vy)*cap : speed.vy;
+}
+
+

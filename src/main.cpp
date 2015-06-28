@@ -6,17 +6,23 @@ bool running;
 
 const int speed_factor = 4;
 const int size_factor = 20;
+const int speed_cap = 4;
 
 bool tile_map_active = true;
 
 //const int starting_entity_nb = 0;
 const int starting_entity_nb = 15;
 
+bool move_left = false;
+bool move_right = false;
+bool move_up = false;
+bool move_down = false;
+
 int mode = CONTACT_TREE_BALL_SPAWN; 
 Area area(2,1);
 Accel gravity;
 Entity camera;
-
+Entity* player = NULL;
 
 void manage_inputs() {
   while(SDL_PollEvent(&events)) {
@@ -111,6 +117,18 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_o:
       set_gravity(0, 0);
     break;
+    case SDLK_UP:
+      move_up = false;
+    break;
+    case SDLK_DOWN:
+      move_down = false;
+    break;
+    case SDLK_LEFT:
+      move_left = false;
+    break;
+    case SDLK_RIGHT:
+      move_right = false;
+    break;
   }
 }
 
@@ -129,6 +147,18 @@ void key_down(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_d:
       camera.accel->ax = 0.2;
     break;
+    case SDLK_UP:
+      move_up = true;
+    break;
+    case SDLK_DOWN:
+      move_down = true;
+    break;
+    case SDLK_LEFT:
+      move_left = true;
+    break;
+    case SDLK_RIGHT:
+      move_right = true;
+    break;
   }
 }
 
@@ -139,7 +169,7 @@ void init_camera() {
   camera.accel = accel_factory.create();
   camera.shape = shape_factory.create();
   //camera.mask = mask_factory.create();
-  camera.position->x = 15;
+  camera.position->x = 0;
   camera.position->y = 0;
   camera.shape->w = WWIDTH;
   camera.shape->h = WHEIGHT;
@@ -368,6 +398,28 @@ void add_contact_tree_ball() {
 }
 
 
+void init_player() {
+  Entity& player_entity = entity_factory.create();
+  player = &player_entity;
+  player->position = position_factory.create();
+  player->speed = speed_factory.create();
+  player->shape = shape_factory.create();
+  player->mask = mask_factory.create();
+  player->accel = accel_factory.create();
+  player->position->x = WWIDTH / 2;
+  player->position->y = WHEIGHT / 2;
+  player->speed->vx = 0;
+  player->speed->vy = 0;
+  player->shape->w = size_factor;
+  player->shape->h = 2*size_factor;
+  player->mask->w = size_factor;
+  player->mask->h = 2*size_factor;
+  // player->flags = SPECULATIVE_COLLIDE | CONTACT_TREE | PLAYER;
+  player->flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE | PLAYER;
+  player->accel->friction = 1;
+}
+
+
 void remove_random_ball() {
   if(entity_factory.nb_obj <= 0) { return; }
   int id_to_remove = rand() % entity_factory.nb_obj;
@@ -531,6 +583,20 @@ void apply_gravity() {
 }
 
 
+void cap_player_speed() {
+  cap_speed(*player, speed_cap);
+}
+
+
+void cap_all_entities_speeds() {
+  for (int i = 0; i < entity_factory.nb_obj; ++i) {
+    Entity& entity = entity_factory.objs[i];
+    cap_speed(entity, speed_cap);
+  }
+  // cap_player_speed();
+}
+
+
 void update_positions() {
   update_position_inertial(camera);
   realize_motion(camera);
@@ -566,13 +632,39 @@ void process_ephemerals() {
   }
 }
 
+void reset_moves() {
+  move_left = false;
+  move_right = false;
+  move_up = false;
+  move_down = false;
+}
+
+
+void apply_player_moves() {
+  if(move_left) {
+    player->accel->ax = -5;
+  }
+  if(move_right) {
+    player->accel->ax = 5;
+  }
+  if(move_up) {
+    player->accel->ay = -5;
+  }
+  if(move_down) {
+    player->accel->ay = 5;
+  }
+}
+
 
 void loop() {
   running = true;
   while(running) { 
     clear_screen();
-    manage_inputs();
     apply_gravity();
+    //reset_moves();
+    manage_inputs();
+    apply_player_moves();
+    cap_player_speed();
     update_positions();
     do_collisions();
     process_ephemerals();
@@ -585,7 +677,8 @@ void loop() {
 int main(int argc, char** argv) {
   init_sdl();
   init_camera();
-  init_entities();
+  init_player();
+  // init_entities();
   init_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 

@@ -44,6 +44,8 @@ void init_entities();
 
 void init_tile_map();
 
+void init_player();
+
 void clear_tile_map();
 
 void set_square_tile_map();
@@ -58,6 +60,10 @@ void clear_all();
 
 void apply_gravity();
 
+void cap_player_speed();
+
+void cap_all_entities_speeds();
+
 void update_positions();
 
 void do_collisions();
@@ -65,6 +71,10 @@ void do_collisions();
 void do_render();
 
 void process_ephemerals();
+
+void reset_moves();
+
+void apply_player_moves();
 
 void loop();
 
@@ -74,8 +84,17 @@ extern int mode;
 
 extern const int speed_factor;
 extern const int size_factor;
+extern const int speed_cap;
 
 extern const int starting_entity_nb;
+
+extern bool move_left;
+extern bool move_right;
+extern bool move_up;
+extern bool move_down;
+
+// for now, only one player controlled entity
+extern Entity* player;
 
 extern bool tile_map_active;
 

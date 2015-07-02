@@ -5,7 +5,13 @@
 #include <map>
 #include <vector>
 
+// 0
+//    0->0 => do nothing
+//    0->1 => do collision (entity : 0, other : 1)
 
+// 1
+//    1->0 => do nothing
+//    1->1 => do nothing
 
 void check_collision(Entity& entity, 
                  std::vector<Collision>& collisions ) {
@@ -158,10 +164,10 @@ void create_collision_tree(std::vector<Collision>& collisions) {
   for(std::vector<Collision>::iterator itCol = collisions.begin(); 
     itCol != collisions.end(); ++itCol) { 
     if(fabs(itCol->cx) >= fabs(itCol->cy)) {
-      if(itCol->cy <= 0) {
+      if(itCol->entity->position->y > itCol->other->position->y) {
         // other stands on entity
         itCol->other->mask->stand_on = itCol->entity;
-      }else if(itCol->cy >0){
+      }else if(itCol->entity->position->y < itCol->other->position->y) {
         // entity stands on other
         itCol->entity->mask->stand_on = itCol->other;
       }
@@ -219,7 +225,7 @@ void resolve_collisions_for_one_rank(const std::vector<Collision*>& collisions) 
           (*itCol)->other->position->sy += (*itCol)->cy;
           (*itCol)->other->speed->vy = 0;
         }else if((*itCol)->entity->mask->down_rk > (*itCol)->other->mask->down_rk) {
-          (*itCol)->entity->position->sy += (*itCol)->cy;
+          (*itCol)->entity->position->sy -= (*itCol)->cy;
           (*itCol)->entity->speed->vy = 0;
         }
       }else{

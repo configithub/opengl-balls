@@ -10,6 +10,10 @@
 #include "aabb_collision.h"
 #include "rectangle.h"
 
+// tiled interface 
+#include "tiled_interface/TMXParser/include/TMXParser.h"
+#include "tiled_interface/TSXParser/include/TSXParser.h"
+
 // component factories
 extern ComponentFactory<Position> tposition_factory;
 extern ComponentFactory<Rectangle> tshape_factory;

@@ -11,7 +11,7 @@ const int speed_cap = 4;
 bool tile_map_active = true;
 
 //const int starting_entity_nb = 0;
-const int starting_entity_nb = 15;
+const int starting_entity_nb = 1;
 
 bool move_left = false;
 bool move_right = false;
@@ -401,6 +401,7 @@ void add_contact_tree_ball() {
 void init_player() {
   Entity& player_entity = entity_factory.create();
   player = &player_entity;
+  //player->id = 999;
   player->position = position_factory.create();
   player->speed = speed_factory.create();
   player->shape = shape_factory.create();
@@ -677,8 +678,8 @@ void loop() {
 int main(int argc, char** argv) {
   init_sdl();
   init_camera();
+  init_entities();
   init_player();
-  // init_entities();
   init_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 

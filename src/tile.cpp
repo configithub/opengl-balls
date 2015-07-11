@@ -95,4 +95,15 @@ bool Area::valid_map_position(int x, int y, Entity& entity) const {
   return true;
 }
 
+void Area::load_from_tmx(std::string& tmx_filename) {
+  TMX::Parser tmx;
+  tmx.load(tmx_filename.c_str());
+  printf("loading tmx file %s, number of tilesets %d\n", tmx_filename.c_str(), 
+    tmx.tilesetList.size());
+
+}
+
+
+
+
 

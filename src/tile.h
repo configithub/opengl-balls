@@ -11,8 +11,10 @@
 #include "rectangle.h"
 
 // tiled interface 
-#include "tiled_interface/TMXParser/include/TMXParser.h"
-#include "tiled_interface/TSXParser/include/TSXParser.h"
+//#include "tiled_interface/TMXParser/include/TMXParser.h"
+//#include "tiled_interface/TSXParser/include/TSXParser.h"
+#include <TMXParser.h>
+#include <TSXParser.h>
 
 // component factories
 extern ComponentFactory<Position> tposition_factory;
@@ -66,6 +68,8 @@ public:
   const Tile& get_tile(const Position& pos) const;
   
   bool valid_map_position(int x, int y, Entity& entity) const;
+
+  void load_from_tmx(std::string& tmx_filename);
 
 };
 

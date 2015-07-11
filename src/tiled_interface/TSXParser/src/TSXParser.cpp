@@ -1,4 +1,4 @@
-#include "TSXParser.h"
+#include <TSXParser.h>
 
 #include <cstdlib>
 #include <iostream>

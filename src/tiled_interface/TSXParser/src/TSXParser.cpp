@@ -29,8 +29,8 @@ namespace TSX {
     tileset.name = root_node->first_attribute( "name" )->value();
     tileset.tileWidth = std::atoi( root_node->first_attribute( "tilewidth" )->value() );
     tileset.tileHeight = std::atoi( root_node->first_attribute( "tileheight" )->value() );
-    tileset.spacing = std::atoi( root_node->first_attribute( "spacing" )->value() );
-    tileset.margin = std::atoi( root_node->first_attribute( "margin" )->value() );
+    //tileset.spacing = std::atoi( root_node->first_attribute( "spacing" )->value() );
+    //tileset.margin = std::atoi( root_node->first_attribute( "margin" )->value() );
 
     if( root_node->first_node( "tileoffset" ) != 0 ) {
       tileset.offsetX = std::atoi( root_node->first_node( "tileoffset" )->first_attribute( "x" )->value() );

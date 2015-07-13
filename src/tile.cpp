@@ -198,13 +198,13 @@ void Area::load_from_tmx(const char* tmx_filename) {
     // plain csv
     //std::string& tile_layer = tmx.tileLayer[it->first].data.contents;
     std::vector<int> tile_ids;
-    std::cout << "Decoded Tile Layer: " << tile_layer << std::endl;
+    //std::cout << "Decoded Tile Layer: " << tile_layer << std::endl;
     for(std::string::iterator it = tile_layer.begin(); it != tile_layer.end(); ++it) {
       tile_ids.push_back( (int)(*it) );
     }
     for(std::vector<int>::iterator itTileId = tile_ids.begin(); 
       itTileId != tile_ids.end(); ++itTileId) { 
-      std::cout << *itTileId << ", ";
+      //std::cout << *itTileId << ", ";
     }  
     std::cout << std::endl;
     

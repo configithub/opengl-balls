@@ -37,6 +37,7 @@ namespace TSX {
       tileset.offsetY = std::atoi( root_node->first_node( "tileoffset" )->first_attribute( "y" )->value() );
     }
 
+
     //parse tileset properties
     if( root_node->first_node( "properties" ) != 0 ) {
       for( rapidxml::xml_node<>* properties_node = root_node->first_node( "properties" )->first_node( "property" ); properties_node; properties_node = properties_node->next_sibling() ) {

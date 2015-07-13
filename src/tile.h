@@ -11,8 +11,6 @@
 #include "rectangle.h"
 
 // tiled interface 
-//#include "tiled_interface/TMXParser/include/TMXParser.h"
-//#include "tiled_interface/TSXParser/include/TSXParser.h"
 #include <TMXParser.h>
 #include <TSXParser.h>
 
@@ -69,7 +67,7 @@ public:
   
   bool valid_map_position(int x, int y, Entity& entity) const;
 
-  void load_from_tmx(std::string& tmx_filename);
+  void load_from_tmx(const char* tmx_filename);
 
 };
 

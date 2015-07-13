@@ -511,6 +511,12 @@ void init_tile_map() {
 }
 
 
+void load_tile_map() {
+  area.load_from_tmx("data/tileset/basic.tmx");
+  //area.load_from_tmx("../data/tileset/basic.tmx");
+}
+
+
 void clear_tile_map() {
   printf("clearing tilemap\n");
   int width = WWIDTH / tile_size;
@@ -681,6 +687,7 @@ int main(int argc, char** argv) {
   init_entities();
   init_player();
   init_tile_map();
+  load_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 
   loop();

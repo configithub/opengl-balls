@@ -148,9 +148,9 @@ void Area::load_from_tmx(const char* tmx_filename) {
       int tm_y = idx / (screen_width * screen_height * width);
       int k = tm_y * width + tm_x;
       Map& tm = tilemaps[k];
-      // calculate tile coordinates 
+      // calculate tile coordinates relative to its screen sized map
       int i = idx % screen_width;
-      int j = idx / (screen_width * width) % screen_width;
+      int j = idx / (screen_width * width) % screen_height;
       // if( *itTileId != 0 ) { std::cout << *itTileId << std::endl; }
       Tile tile;  
       // set all tile params

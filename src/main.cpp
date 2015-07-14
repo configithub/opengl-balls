@@ -484,7 +484,7 @@ void init_tile_map() {
   int height = WHEIGHT / tile_size;
   int half_tile = tile_size / 2;
   for(int k = 0; k < area.width*area.height; ++k) {
-    TileMap tm;
+    Map tm;
     tm.tiles.reserve(height*width);
     for(int j = 0; j < height; ++j) {
       for(int i = 0; i < width; ++i) {
@@ -512,8 +512,10 @@ void init_tile_map() {
 
 
 void load_tile_map() {
+  area = Area();
   area.load_from_tmx("data/tileset/basic.tmx");
   //area.load_from_tmx("../data/tileset/basic.tmx");
+  tile_map_active = true;
 }
 
 

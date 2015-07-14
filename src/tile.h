@@ -42,33 +42,38 @@ public:
 };
 
 
-class TileMap {
+// map the same size as the screen size
+class Map {
 public:
-  TileMap() {}
+  Map() {}
   std::vector<Tile> tiles;
   void render(const Entity& camera);
 };
 
+
 class Area {
 public:
   Area(int w, int h);
+  Area();
+  void render(const Entity& camera);
+
+  // get tile at tile coordinates
+  const Tile& get_tile(int tx, int ty) const;
+  // get tile at game position
+  const Tile& get_tile(const Position& pos) const;
+  // check if position is valid against the map
+  bool valid_map_position(int x, int y, Entity& entity) const;
+  // load area from tmx file
+  void load_from_tmx(const char* tmx_filename);
+
+  // dimension in screen sizes or Maps objects
   int width;
   int height;
 
-  std::vector<TileMap> tilemaps;
+  std::vector<Map> tilemaps;
   Tile default_void_tile;
   Tile default_solid_tile;
-  void render(const Entity& camera);
-
-  // in tile coordinates
-  const Tile& get_tile(int tx, int ty) const;
-  // in game position
-  const Tile& get_tile(const Position& pos) const;
-  
-  bool valid_map_position(int x, int y, Entity& entity) const;
-
-  void load_from_tmx(const char* tmx_filename);
-
+  std::vector<TSX::Parser> tilesets;
 };
 
 

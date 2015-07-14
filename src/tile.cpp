@@ -26,7 +26,7 @@ void Tile::remove() {
 }
 
 
-void TileMap::render(const Entity& camera) {
+void Map::render(const Entity& camera) {
   for(std::vector<Tile>::iterator itt = tiles.begin(); 
     itt != tiles.end(); ++itt) { 
     render_tile(*itt, camera);
@@ -36,7 +36,7 @@ void TileMap::render(const Entity& camera) {
 
 void Area::render(const Entity& camera) {
   // TODO: only render what is visible
-  for(std::vector<TileMap>::iterator ittm = tilemaps.begin(); 
+  for(std::vector<Map>::iterator ittm = tilemaps.begin(); 
     ittm != tilemaps.end(); ++ittm) { 
     ittm->render(camera);
   }  
@@ -47,6 +47,12 @@ Area::Area(int w, int h) {
   width = w; height = h;
   printf("creating area of size: %d, %d x %d\n", width*height, width, height);
   tilemaps.reserve(width*height);
+  default_solid_tile.flags = SOLID;
+  default_void_tile.flags = VOID;
+}
+
+
+Area::Area() {
   default_solid_tile.flags = SOLID;
   default_void_tile.flags = VOID;
 }
@@ -63,7 +69,7 @@ const Tile& Area::get_tile(int tx, int ty) const {
     printf("fall back on default solid tile\n");
   }
 
-  const TileMap& tm = tilemaps[tm_y*width + tm_x];
+  const Map& tm = tilemaps[tm_y*width + tm_x];
   // find the tile in this tilemap
   return tm.tiles[ty*screen_width+tx];
 }
@@ -74,7 +80,7 @@ const Tile& Area::get_tile(const Position& pos) const {
   // find the tilemap
   int tm_x = pos.x / WWIDTH;
   int tm_y = pos.y / WHEIGHT;
-  const TileMap& tm = tilemaps[tm_y*width + tm_x];
+  const Map& tm = tilemaps[tm_y*width + tm_x];
   // find the tile in this tilemap
   return tm.tiles[((pos.y%WHEIGHT)/tile_size)*screen_width
                           +((pos.x%WWIDTH)/tile_size) ];
@@ -98,6 +104,85 @@ bool Area::valid_map_position(int x, int y, Entity& entity) const {
 }
 
 void Area::load_from_tmx(const char* tmx_filename) {
+  // load tilemaps 
+  TMX::Parser tmx;
+  tmx.load(tmx_filename);
+  printf("loading tmx file %s, number of tilesets %d\n", tmx_filename, 
+    tmx.tilesetList.size());
+
+  // set the area size, warning : the width and height must be multiples
+  //  of screen_width and screen_height respectively
+  //  which are the width and height of one screen in tiles
+  width = tmx.mapInfo.width / screen_width;
+  height = tmx.mapInfo.height / screen_height;
+  tilemaps.reserve(width*height);
+  printf("loading area of size %d x %d\n", width, height);
+  for(int k = 0; k < width*height; ++k) {
+    Map tm; tm.tiles.reserve(height*width);
+    tilemaps.push_back(tm);
+  }
+
+  for( std::map<std::string, TMX::Parser::TileLayer>::iterator it = 
+        tmx.tileLayer.begin(); it != tmx.tileLayer.end(); ++it ) {
+    // decode (base64) and decompress (zlib) raw tile layer data
+    std::string& raw_tlayer = tmx.tileLayer[it->first].data.contents;
+    raw_tlayer = trim(raw_tlayer);
+    std::string decoded = base64_decode(raw_tlayer);
+    std::string tile_layer = decompress_string(decoded);
+    std::vector<int> tile_ids;
+    // look for tile ids
+    int idx = 0;
+    for(std::string::iterator it = tile_layer.begin(); 
+      it != tile_layer.end(); ++it) {
+      if(idx%4 == 0) {
+        tile_ids.push_back( (int)(*it) );
+      } ++idx;
+    }
+    // build the maps composing the area from tile ids
+    idx = 0;
+    int half_tile = tile_size / 2;
+    for(std::vector<int>::iterator itTileId = tile_ids.begin(); 
+      itTileId != tile_ids.end(); ++itTileId) { 
+      // pick the correct map (screen sized) 
+      int tm_x = (idx / screen_width) % width;
+      int tm_y = idx / (screen_width * screen_height * width);
+      int k = tm_y * width + tm_x;
+      Map& tm = tilemaps[k];
+      // calculate tile coordinates 
+      int i = idx % screen_width;
+      int j = idx / (screen_width * screen_height) % width;
+      Tile tile;  
+      // set all tile params
+      tile.flags = *itTileId != 0 ? SOLID : VOID;
+      tile.position = tposition_factory.create();
+      tile.position->x = ((k%width)*screen_width+i)*tile_size+half_tile;
+      tile.position->y = ((k/width)*screen_height+j)*tile_size+half_tile;
+      if(tile.flags == SOLID) { 
+        tile.shape = tshape_factory.create();       
+        tile.mask = tmask_factory.create();       
+        tile.shape->w = tile_size;
+        tile.shape->h = tile_size;
+        tile.mask->w = tile_size;
+        tile.mask->h = tile_size;
+      }
+      tm.tiles.push_back(tile);
+      ++idx;
+    }  
+  }
+
+  // load tilesets
+  for( int i = 0; i < tmx.tilesetList.size(); i++ ) {
+    TSX::Parser tileset;
+    tilesets.push_back(tileset);
+    TSX::Parser& tsx = tilesets.back();
+    //tsx.load( tmx.tilesetList[i].source.c_str() );
+    tsx.load("data/tileset/simple.tsx");
+  }
+}
+
+
+/*
+void Area::load_from_tmx(const char* tmx_filename) {
   TMX::Parser tmx;
   tmx.load(tmx_filename);
   printf("loading tmx file %s, number of tilesets %d\n", tmx_filename, 
@@ -109,7 +194,9 @@ void Area::load_from_tmx(const char* tmx_filename) {
     //////////////////////
     //TSXParse starts here
     //////////////////////
-    TSX::Parser tsx;
+    TSX::Parser tileset;
+    tilesets.push_back(tileset);
+    TSX::Parser& tsx = tilesets.back();
     //tsx.load( tmx.tilesetList[i].source.c_str() );
     tsx.load("data/tileset/simple.tsx");
 
@@ -204,7 +291,7 @@ void Area::load_from_tmx(const char* tmx_filename) {
     }
     for(std::vector<int>::iterator itTileId = tile_ids.begin(); 
       itTileId != tile_ids.end(); ++itTileId) { 
-      //std::cout << *itTileId << ", ";
+      std::cout << *itTileId << ", ";
     }  
     std::cout << std::endl;
     
@@ -254,6 +341,8 @@ void Area::load_from_tmx(const char* tmx_filename) {
   }
 
 }
+
+*/
 
 
 

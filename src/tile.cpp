@@ -150,10 +150,12 @@ void Area::load_from_tmx(const char* tmx_filename) {
       Map& tm = tilemaps[k];
       // calculate tile coordinates 
       int i = idx % screen_width;
-      int j = idx / (screen_width * screen_height) % width;
+      int j = idx / (screen_width * width) % screen_width;
+      // if( *itTileId != 0 ) { std::cout << *itTileId << std::endl; }
       Tile tile;  
       // set all tile params
       tile.flags = *itTileId != 0 ? SOLID : VOID;
+      tile.flags = *itTileId == 9 ? VOID : tile.flags;
       tile.position = tposition_factory.create();
       tile.position->x = ((k%width)*screen_width+i)*tile_size+half_tile;
       tile.position->y = ((k/width)*screen_height+j)*tile_size+half_tile;

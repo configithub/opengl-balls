@@ -19,7 +19,8 @@ bool move_up = false;
 bool move_down = false;
 
 int mode = CONTACT_TREE_BALL_SPAWN; 
-Area area(2,1);
+// Area area(2,1);
+Area area;
 Accel gravity;
 Entity camera;
 Entity* player = NULL;
@@ -688,7 +689,7 @@ int main(int argc, char** argv) {
   init_camera();
   init_entities();
   init_player();
-  init_tile_map();
+  //init_tile_map();
   load_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 

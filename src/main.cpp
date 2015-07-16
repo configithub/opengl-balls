@@ -19,7 +19,8 @@ bool move_up = false;
 bool move_down = false;
 
 int mode = CONTACT_TREE_BALL_SPAWN; 
-Area area(2,1);
+// Area area(2,1);
+Area area;
 Accel gravity;
 Entity camera;
 Entity* player = NULL;
@@ -484,7 +485,7 @@ void init_tile_map() {
   int height = WHEIGHT / tile_size;
   int half_tile = tile_size / 2;
   for(int k = 0; k < area.width*area.height; ++k) {
-    TileMap tm;
+    Map tm;
     tm.tiles.reserve(height*width);
     for(int j = 0; j < height; ++j) {
       for(int i = 0; i < width; ++i) {
@@ -507,6 +508,14 @@ void init_tile_map() {
     } 
     area.tilemaps.push_back(tm);
   }
+  tile_map_active = true;
+}
+
+
+void load_tile_map() {
+  area = Area();
+  area.load_from_tmx("data/tileset/basic.tmx");
+  //area.load_from_tmx("../data/tileset/basic.tmx");
   tile_map_active = true;
 }
 
@@ -680,7 +689,8 @@ int main(int argc, char** argv) {
   init_camera();
   init_entities();
   init_player();
-  init_tile_map();
+  //init_tile_map();
+  load_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 
   loop();

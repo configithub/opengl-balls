@@ -44,6 +44,8 @@ void init_entities();
 
 void init_tile_map();
 
+void load_tile_map();
+
 void init_player();
 
 void clear_tile_map();

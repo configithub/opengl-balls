@@ -178,7 +178,7 @@ void Area::load_from_tmx(const char* tmx_filename) {
     tilesets.push_back(tileset);
     TSX::Parser& tsx = tilesets.back();
     //tsx.load( tmx.tilesetList[i].source.c_str() );
-    tsx.load("data/tileset/simple.tsx");
+    tsx.load("data/tileset/simple.tsx"); // TODO remove hardcode
   }
 }
 

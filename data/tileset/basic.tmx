@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="80" height="60" tilewidth="16" tileheight="16">
  <tileset firstgid="1" source="simple.tsx"/>
- <layer name="Tile Layer 1" width="80" height="60" margin="0" border="0">
+ <layer name="Tile Layer 1" width="80" height="60">
   <data encoding="base64" compression="zlib">
-   eJzt0EsKgEAMRMER/KALvf9tzQWyihAHquDtmx6Dr+zRlXQ07prFHZ1JT+OuWfivxn81/qvxX43/avxXs0ZL0ta4CwAAAAAAAAAAAAAAAAAAAP7uBdzcAp4=
+   eJzt0LsKgDAQRcH1jRb6/39rOlNoERATcAZOt8VyIwAAAAAAAP5rTm2FLVU+bdOeWgs7qnzapny/PtU9NIT97oxxbTS9cAcAAAAAAAAAAAAAwHdODlIBcQ==
   </data>
  </layer>
 </map>

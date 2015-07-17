@@ -1,5 +1,6 @@
 #include "tile.h"
 #include "entity.h"
+#include "render_tools.h"
 #include <iostream>
 #include <base64.h>
 
@@ -27,9 +28,12 @@ void Tile::remove() {
 
 
 void Map::render(const Entity& camera) {
+  std::string tileset_name("data/tileset/simple.png"); // TODO remove hardcode
+  Texture& t = textures[tileset_name];
   for(std::vector<Tile>::iterator itt = tiles.begin(); 
     itt != tiles.end(); ++itt) { 
-    render_tile(*itt, camera);
+    //render_tile(*itt, camera);
+    render_tile_textured(t, *itt, camera);
   }  
 }
 
@@ -156,22 +160,26 @@ void Area::load_from_tmx(const char* tmx_filename) {
       // set all tile params
       tile.flags = *itTileId != 0 ? SOLID : VOID;
       tile.flags = *itTileId == 9 ? VOID : tile.flags;
+      tile.tileset_part = *itTileId;
       tile.position = tposition_factory.create();
       tile.position->x = ((k%width)*screen_width+i)*tile_size+half_tile;
       tile.position->y = ((k/width)*screen_height+j)*tile_size+half_tile;
-      if(tile.flags == SOLID) { 
+      //if(tile.flags == SOLID) { 
         tile.shape = tshape_factory.create();       
         tile.mask = tmask_factory.create();       
         tile.shape->w = tile_size;
         tile.shape->h = tile_size;
         tile.mask->w = tile_size;
         tile.mask->h = tile_size;
-      }
+      //}
       tm.tiles.push_back(tile);
       ++idx;
     }  
   }
+  load_tilesets(tmx);
+}
 
+void Area::load_tilesets(const TMX::Parser& tmx) {
   // load tilesets
   for( int i = 0; i < tmx.tilesetList.size(); i++ ) {
     TSX::Parser tileset;
@@ -179,5 +187,9 @@ void Area::load_from_tmx(const char* tmx_filename) {
     TSX::Parser& tsx = tilesets.back();
     //tsx.load( tmx.tilesetList[i].source.c_str() );
     tsx.load("data/tileset/simple.tsx"); // TODO remove hardcode
+    //load_png(tsx.tileset.image.source.c_str());
+    load_png("data/tileset/simple.png"); // TODO remove hardcode
   }
 }
+
+

@@ -5,6 +5,18 @@
 #include <SDL/SDL_image.h>
 #include <GL/gl.h>
 #include <stdbool.h>
+#include <map>
+#include <string>
+
+
+class Texture {
+public:
+  int w,h;
+  int id; // glid
+};
+
+// hold all textures
+extern std::map<std::string, Texture> textures;
 
 
 bool init_sdl();
@@ -32,6 +44,11 @@ void draw_square_gradient(int x1, int y1, int x2, int y2,
                         float r4, float g4, float b4);
 
 
+void load_png(const char* name);
+
+void draw_rectangle_texture(const Texture& t, int x, int y, 
+                    int xtex, int ytex, int wtex, int htex);
+               // GLfloat r, GLfloat g, GLfloat b, GLfloat a);
 
 
 #endif

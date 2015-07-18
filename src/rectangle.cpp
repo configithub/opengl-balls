@@ -5,6 +5,10 @@
 
 #include <math.h>
 
+// TODO
+#include <iostream>
+
+
 Rectangle rectangles[max_entity_nb];
 
 void render(Entity& entity, const Entity& camera) {
@@ -19,6 +23,7 @@ void render(Entity& entity, const Entity& camera) {
                      pos.x-w - camera.position->x, pos.y+h - camera.position->y);
 }
 
+
 void render_tile(Tile& tile, const Entity& camera) {
   if ( tile.position == NULL 
     || tile.shape == NULL
@@ -31,6 +36,24 @@ void render_tile(Tile& tile, const Entity& camera) {
               pos.x+w - camera.position->x, pos.y+h - camera.position->y,
               pos.x-w - camera.position->x, pos.y+h - camera.position->y);
 }
+
+
+void render_tile_textured(const Texture& t, Tile& tile, const Entity& camera) {
+  if ( tile.position == NULL 
+    || tile.shape == NULL) { return; }
+  Position& pos = *(tile.position);
+  Rectangle& rect = *(tile.shape);
+  int w = rect.w/2; int h = rect.h/2;
+  // the tileset image is all on one row 
+  int xtex = (tile.tileset_part-1) * rect.w;
+  int ytex = 0;
+  // std::cout << xtex << ", " << ytex << std::endl;
+  draw_rectangle_texture(t, pos.x-w - camera.position->x, 
+                            pos.y-h - camera.position->y,
+                          xtex, ytex, rect.w, rect.h);
+                            
+}
+
 
 void render_rotated(Entity& entity, const Entity& camera) {
   if ( entity.position == NULL 

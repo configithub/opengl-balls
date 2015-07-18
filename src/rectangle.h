@@ -6,6 +6,7 @@
 
 class Entity;
 class Tile;
+class Texture;
 
 class Rectangle : public Component {
 public:
@@ -16,7 +17,7 @@ public:
 
 void render(Entity& entity, const Entity& camera);
 void render_tile(Tile& tile, const Entity& camera);
+void render_tile_textured(const Texture& t, Tile& tile, const Entity& camera);
 void render_rotated(Entity& entity, const Entity& camera);
-
 
 #endif

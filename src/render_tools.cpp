@@ -1,6 +1,9 @@
 #include "render_tools.h"
 #include "constants.h"
 
+#include <iostream>
+
+std::map<std::string, Texture> textures;
 
 bool init_sdl() {
   if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK) == -1 ) {
@@ -106,9 +109,66 @@ void draw_square_gradient(int x1, int y1, int x2, int y2,
 }
 
 
+void load_png(const char* name) {
+  SDL_Surface *pic = IMG_Load(name);
+  GLenum glFormat = (pic->format->BitsPerPixel == 32 ? GL_RGBA : GL_RGB);
+  GLuint currentTexture = 0;
+  glGenTextures(1, &currentTexture);
+
+  glBindTexture(GL_TEXTURE_2D, currentTexture);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, glFormat, pic->w, pic->h, 0, 
+                    glFormat, GL_UNSIGNED_BYTE, NULL);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, pic->w, pic->h,
+                    glFormat, GL_UNSIGNED_BYTE, pic->pixels);
+
+  // keep a ref on this in the texture map
+  Texture t;
+  t.w = pic->w; t.h = pic->h;
+  t.id = currentTexture;
+  std::string name_str(name);
+  textures[name_str] = t;
+  SDL_FreeSurface(pic);
+}
 
 
+void draw_rectangle_texture(const Texture& t , int x, int y, 
+                    int xtex, int ytex, int wtex, int htex) {
+              //  GLfloat r, GLfloat g, GLfloat b, GLfloat a) {
+  int totalTexW = t.w;
+  int totalTexH = t.h;
+  float x1 = xtex / (float)totalTexW;  
+  float y1 = ytex / (float)totalTexH;  
+  float x2 = (xtex + wtex) / (float)totalTexW;  
+  float y2 = (ytex + htex) / (float)totalTexH;  
 
+  GLfloat textureCoordinates[] = { x1, y1, // top left
+    x2, y1,  // top right
+    x2, y2,  // bottom right
+    x1, y2}; // bottom left
+  GLfloat vertices[] = { (float)x, (float)y, // top left
+    (float)x + wtex, (float)y, // top right
+    (float)x + wtex, (float)y + htex, // bottom right
+    (float)x, (float)y + htex }; // bottom left
+  //glColor4f(r, g, b, a);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, t.id);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, vertices);
+  glTexCoordPointer(2, GL_FLOAT, 0, textureCoordinates);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4); 
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
 
 
 

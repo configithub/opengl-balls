@@ -31,10 +31,11 @@ public:
   Position* position;
   Rectangle* shape;
   AABB* mask;
+  int tileset_part; // the part of the tileset to use for rendering
 
   // init all components to null
-  Tile():  position(NULL), 
-            shape(NULL), mask(NULL) {};
+  Tile():  position(NULL), shape(NULL), mask(NULL),
+           tileset_part(-1) {};
 
   void remove();
   void set_void();
@@ -48,6 +49,7 @@ public:
   Map() {}
   std::vector<Tile> tiles;
   void render(const Entity& camera);
+  Texture* texture;
 };
 
 
@@ -65,6 +67,7 @@ public:
   bool valid_map_position(int x, int y, Entity& entity) const;
   // load area from tmx file
   void load_from_tmx(const char* tmx_filename);
+  void load_tilesets(const TMX::Parser& tmx);
 
   // dimension in screen sizes or Maps objects
   int width;

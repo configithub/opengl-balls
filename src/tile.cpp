@@ -28,12 +28,10 @@ void Tile::remove() {
 
 
 void Map::render(const Entity& camera) {
-  std::string tileset_name("data/tileset/simple.png"); // TODO remove hardcode
-  Texture& t = textures[tileset_name];
   for(std::vector<Tile>::iterator itt = tiles.begin(); 
     itt != tiles.end(); ++itt) { 
     //render_tile(*itt, camera);
-    render_tile_textured(t, *itt, camera);
+    render_tile_textured(*texture, *itt, camera);
   }  
 }
 
@@ -185,10 +183,18 @@ void Area::load_tilesets(const TMX::Parser& tmx) {
     TSX::Parser tileset;
     tilesets.push_back(tileset);
     TSX::Parser& tsx = tilesets.back();
-    //tsx.load( tmx.tilesetList[i].source.c_str() );
-    tsx.load("data/tileset/simple.tsx"); // TODO remove hardcode
-    //load_png(tsx.tileset.image.source.c_str());
-    load_png("data/tileset/simple.png"); // TODO remove hardcode
+    // load tileset object
+    std::string tsx_path = tileset_path + tmx.tilesetList[i].source;
+    tsx.load( tsx_path.c_str() );
+    // load a texture from the png image path
+    std::string png_path = tileset_path + tsx.tileset.image.source;
+    load_png(png_path.c_str());
+    // bind the texture obj to the tilemaps
+    Texture& t = textures[png_path];
+    for(std::vector<Map>::iterator itm = tilemaps.begin(); 
+      itm != tilemaps.end(); ++itm) { 
+      itm->texture = &t;
+    }  
   }
 }
 

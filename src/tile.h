@@ -49,6 +49,7 @@ public:
   Map() {}
   std::vector<Tile> tiles;
   void render(const Entity& camera);
+  Texture* texture;
 };
 
 

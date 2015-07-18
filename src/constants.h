@@ -2,6 +2,7 @@
 #define _CONSTANSTS_H_
 
 #include <cstddef>
+#include <string>
 
 #define WWIDTH 640 // 40 tiles width
 #define WHEIGHT 480 // 30 tiles height
@@ -22,5 +23,7 @@ extern int screen_width;
 extern int screen_height;
 
 int sgn(int val); // helper function to get the sign of an int
+
+static std::string tileset_path = "data/tileset/";
 
 #endif

@@ -589,10 +589,11 @@ void apply_gravity() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     if(entity.accel == NULL) { continue; }
-    //entity.accel->ax = entity.flags & GRAVITY_BOUND ? entity.accel->ax+gravity.ax : 0;
-    //entity.accel->ay = entity.flags & GRAVITY_BOUND ? entity.accel->ay+gravity.ay : 0;
-    entity.accel->ax = entity.flags & GRAVITY_BOUND ? gravity.ax : 0;
-    entity.accel->ay = entity.flags & GRAVITY_BOUND ? gravity.ay : 0;
+    // TODO resolve bug here
+    // entity.accel->ax = entity.flags & GRAVITY_BOUND ? entity.accel->ax+gravity.ax : 0;
+    // entity.accel->ay = entity.flags & GRAVITY_BOUND ? entity.accel->ay+gravity.ay : 0;
+    //entity.accel->ax = entity.flags & GRAVITY_BOUND ? gravity.ax : 0;
+    //entity.accel->ay = entity.flags & GRAVITY_BOUND ? gravity.ay : 0;
   }
 }
 
@@ -612,11 +613,11 @@ void cap_all_entities_speeds() {
 
 
 void update_positions() {
-  update_position_inertial(camera);
+  update_position_inertial(camera, gravity);
   realize_motion(camera);
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    update_position_inertial(entity);
+    update_position_inertial(entity, gravity);
   }
 }
 
@@ -679,7 +680,7 @@ void loop() {
   while(running) { 
     clear_screen();
     apply_gravity();
-    //reset_moves();
+    reset_moves();
     manage_inputs();
     apply_player_moves();
     cap_player_speed();
@@ -697,7 +698,7 @@ int main(int argc, char** argv) {
   init_camera();
   init_entities();
   init_player();
-  //init_tile_map();
+  init_tile_map();
   load_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 

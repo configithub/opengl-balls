@@ -6,7 +6,7 @@ bool running;
 
 const int speed_factor = 4;
 const int size_factor = 20;
-const int speed_cap = 4;
+const int speed_cap = 5;
 
 bool tile_map_active = true;
 
@@ -402,7 +402,6 @@ void add_contact_tree_ball() {
 void init_player() {
   Entity& player_entity = entity_factory.create();
   player = &player_entity;
-  //player->id = 999;
   player->position = position_factory.create();
   player->speed = speed_factory.create();
   player->shape = shape_factory.create();
@@ -416,11 +415,9 @@ void init_player() {
   player->shape->h = 2*size_factor;
   player->mask->w = size_factor;
   player->mask->h = 2*size_factor;
-  // player->flags = SPECULATIVE_COLLIDE | CONTACT_TREE | PLAYER;
   player->flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE 
                   | PLAYER | CAN_JUMP;
-  // player->accel->friction = 0.0;
-  player->accel->friction = 0.5;
+  player->accel->friction = 1;
 }
 
 
@@ -517,7 +514,6 @@ void init_tile_map() {
 void load_tile_map() {
   area = Area();
   area.load_from_tmx("data/tileset/basic.tmx");
-  //area.load_from_tmx("../data/tileset/basic.tmx");
   tile_map_active = true;
 }
 
@@ -589,12 +585,11 @@ void apply_gravity() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     if(entity.accel == NULL) { continue; }
-    // TODO resolve bug here
-    // entity.accel->ax = entity.flags & GRAVITY_BOUND ? entity.accel->ax+gravity.ax : 0;
-    // entity.accel->ay = entity.flags & GRAVITY_BOUND ? entity.accel->ay+gravity.ay : 0;
-    //entity.accel->ax = entity.flags & GRAVITY_BOUND ? gravity.ax : 0;
-    //entity.accel->ay = entity.flags & GRAVITY_BOUND ? gravity.ay : 0;
+    entity.speed->vx = entity.flags & GRAVITY_BOUND ? entity.speed->vx+gravity.ax : 0;
+    entity.speed->vy = entity.flags & GRAVITY_BOUND ? entity.speed->vy+gravity.ay : 0;
   }
+  player->speed->vx = player->flags & GRAVITY_BOUND ? player->speed->vx+gravity.ax : 0;
+  player->speed->vy = player->flags & GRAVITY_BOUND ? player->speed->vy+gravity.ay : 0;
 }
 
 
@@ -608,16 +603,16 @@ void cap_all_entities_speeds() {
     Entity& entity = entity_factory.objs[i];
     cap_speed(entity, speed_cap);
   }
-  // cap_player_speed();
+  cap_player_speed();
 }
 
 
 void update_positions() {
-  update_position_inertial(camera, gravity);
+  update_position_inertial(camera);
   realize_motion(camera);
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
-    update_position_inertial(entity, gravity);
+    update_position_inertial(entity);
   }
 }
 

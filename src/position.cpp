@@ -47,7 +47,7 @@ void update_position(Entity& entity) {
 }
 
 
-void update_position_inertial(Entity& entity, Accel& gravity) {
+void update_position_inertial(Entity& entity) {
   if(entity.accel == NULL &&
      entity.mask != NULL) {
     update_position(entity);
@@ -64,21 +64,13 @@ void update_position_inertial(Entity& entity, Accel& gravity) {
   AABB& mask = *(entity.mask);
   // apply acceleration
   speed.vx += accel.ax - sgn(speed.vx)*accel.friction;
-  speed.vy += accel.ay - sgn(speed.vy)*accel.friction;
-  if(entity.flags & GRAVITY_BOUND) {
-    speed.vx += gravity.ax;
-    speed.vy += gravity.ay;
-  }
+  speed.vy += accel.ay;  // TODO, different friction value here?
   // apply friction
-  //speed.vx -= fsgn(speed.vx)*accel.friction;
-  //speed.vy -= fsgn(speed.vy)*accel.friction;
   accel.ax -= fsgn(accel.ax)*accel.friction;
   accel.ay -= fsgn(accel.ay)*accel.friction;
   // stop if speed below threshold
-  speed.vx = fabs(speed.vx) < 0.1 ? 0 : speed.vx;
-  speed.vy = fabs(speed.vy) < 0.1 ? 0 : speed.vy;
-  printf("accel %f\n", accel.ay);
-  printf("speed %f\n", speed.vy);
+  speed.vx = fabs(speed.vx) <= accel.friction ? 0 : speed.vx;
+  speed.vy = fabs(speed.vy) <= accel.friction ? 0 : speed.vy;
   // update speculative position
   pos.sx = pos.x; pos.sy = pos.y;
   pos.sx += speed.vx;
@@ -100,8 +92,9 @@ void update_position_inertial(Entity& entity, Accel& gravity) {
 
 void cap_speed(Entity& entity, const int& cap) {
   Speed& speed = *(entity.speed);
+  // TODO, different caps for horizontal and vertical motion
   speed.vx = fabs(speed.vx) > cap ? fsgn(speed.vx)*cap : speed.vx;
-  speed.vy = fabs(speed.vy) > cap ? fsgn(speed.vy)*cap : speed.vy;
+  speed.vy = fabs(speed.vy) > 2*cap ? fsgn(speed.vy)*2*cap : speed.vy;
 }
 
 

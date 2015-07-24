@@ -30,7 +30,8 @@ public:
   float vx;
   float vy;
   float omega;
-  Speed(): vx(0), vy(0), omega(0.0) {}
+  bool can_jump; 
+  Speed(): vx(0), vy(0), omega(0.0), can_jump(false) {}
 };
 
 

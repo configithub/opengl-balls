@@ -12,8 +12,8 @@ void update_position_ghost(Entity& entity) {
   Speed& speed = *(entity.speed);
   Accel& accel = *(entity.accel);
   pos.sx = pos.x; pos.sy = pos.y;
-  speed.vx += accel.ax - sgn(speed.vx)*accel.friction;
-  speed.vy += accel.ay - sgn(speed.vy)*accel.friction;
+  speed.vx += accel.ax - fsgn(speed.vx)*accel.friction;
+  speed.vy += accel.ay - fsgn(speed.vy)*accel.friction;
   pos.sx += speed.vx;
   pos.sy += speed.vy;
   // do realize motion now, as there is no collision anyway
@@ -62,8 +62,29 @@ void update_position_inertial(Entity& entity) {
   Speed& speed = *(entity.speed);
   Accel& accel = *(entity.accel);
   AABB& mask = *(entity.mask);
+  // apply acceleration
+  printf("1 speed vx: %f\n", speed.vx);
   speed.vx += accel.ax - sgn(speed.vx)*accel.friction;
   speed.vy += accel.ay - sgn(speed.vy)*accel.friction;
+  printf("1 accel ax: %f\n", accel.ax);
+  //speed.vx += accel.ax;
+  //speed.vy += accel.ay;
+  printf("2 speed vx: %f\n", speed.vx);
+  printf("2 accel ax: %f\n", accel.ax);
+  // apply friction
+  printf("sign speed vx %d\n", fsgn(speed.vx));
+  printf("sign speed vy %d\n", fsgn(speed.vy));
+  //speed.vx -= fsgn(speed.vx)*accel.friction;
+  //speed.vy -= fsgn(speed.vy)*accel.friction;
+  //accel.ax -= fsgn(accel.ax)*accel.friction;
+  //accel.ay -= fsgn(accel.ay)*accel.friction;
+  printf("3 speed vx: %f\n", speed.vx);
+  printf("3 accel ax: %f\n", accel.ax);
+  // stop if speed below threshold
+  speed.vx = fabs(speed.vx) < 0.1 ? 0 : speed.vx;
+  speed.vy = fabs(speed.vy) < 0.1 ? 0 : speed.vy;
+  printf("4 speed vx: %f\n", speed.vx);
+  printf("4 accel ax: %f\n", accel.ax);
   // update speculative position
   pos.sx = pos.x; pos.sy = pos.y;
   pos.sx += speed.vx;
@@ -85,8 +106,8 @@ void update_position_inertial(Entity& entity) {
 
 void cap_speed(Entity& entity, const int& cap) {
   Speed& speed = *(entity.speed);
-  speed.vx = fabs(speed.vx) > cap ? sgn(speed.vx)*cap : speed.vx;
-  speed.vy = fabs(speed.vy) > cap ? sgn(speed.vy)*cap : speed.vy;
+  speed.vx = fabs(speed.vx) > cap ? fsgn(speed.vx)*cap : speed.vx;
+  speed.vy = fabs(speed.vy) > cap ? fsgn(speed.vy)*cap : speed.vy;
 }
 
 

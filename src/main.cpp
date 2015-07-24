@@ -177,7 +177,7 @@ void init_camera() {
   //camera.mask->w = WWIDTH;
   //camera.mask->h = WHEIGHT;
   camera.flags = GHOST;
-  camera.accel->friction = 1;
+  camera.accel->friction = 0;
 }
 
 
@@ -417,8 +417,10 @@ void init_player() {
   player->mask->w = size_factor;
   player->mask->h = 2*size_factor;
   // player->flags = SPECULATIVE_COLLIDE | CONTACT_TREE | PLAYER;
-  player->flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE | PLAYER;
-  player->accel->friction = 1;
+  player->flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE 
+                  | PLAYER | CAN_JUMP;
+  // player->accel->friction = 0.0;
+  player->accel->friction = 0.5;
 }
 
 
@@ -587,6 +589,8 @@ void apply_gravity() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     if(entity.accel == NULL) { continue; }
+    //entity.accel->ax = entity.flags & GRAVITY_BOUND ? entity.accel->ax+gravity.ax : 0;
+    //entity.accel->ay = entity.flags & GRAVITY_BOUND ? entity.accel->ay+gravity.ay : 0;
     entity.accel->ax = entity.flags & GRAVITY_BOUND ? gravity.ax : 0;
     entity.accel->ay = entity.flags & GRAVITY_BOUND ? gravity.ay : 0;
   }
@@ -658,10 +662,14 @@ void apply_player_moves() {
     player->accel->ax = 5;
   }
   if(move_up) {
-    player->accel->ay = -5;
+    if(player->flags & CAN_JUMP)
+      player->accel->ay = player->speed->can_jump ? -15 : player->accel->ay;
+    else
+      player->accel->ay = -5;
   }
   if(move_down) {
-    player->accel->ay = 5;
+    if(!(player->flags & CAN_JUMP))
+      player->accel->ay = 5;
   }
 }
 

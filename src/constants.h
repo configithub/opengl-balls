@@ -23,6 +23,7 @@ extern int screen_width;
 extern int screen_height;
 
 int sgn(int val); // helper function to get the sign of an int
+int fsgn(float val);
 
 static std::string tileset_path = "data/tileset/";
 

@@ -22,7 +22,8 @@ typedef enum {
   SPECULATIVE_COLLIDE = 16,
   CONTACT_TREE = 32,
   PLAYER = 64,
-  EPHEMERAL = 128
+  EPHEMERAL = 128,
+  CAN_JUMP = 256
 } EN_Flag;
 
 class Entity : public Object {

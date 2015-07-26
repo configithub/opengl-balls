@@ -14,6 +14,9 @@ void update_position_ghost(Entity& entity) {
   pos.sx = pos.x; pos.sy = pos.y;
   speed.vx += accel.ax - fsgn(speed.vx)*accel.friction;
   speed.vy += accel.ay - fsgn(speed.vy)*accel.friction;
+  // apply friction
+  accel.ax -= fsgn(accel.ax)*accel.friction;
+  accel.ay -= fsgn(accel.ay)*accel.friction;
   pos.sx += speed.vx;
   pos.sy += speed.vy;
   // do realize motion now, as there is no collision anyway

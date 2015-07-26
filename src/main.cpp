@@ -13,10 +13,15 @@ bool tile_map_active = true;
 //const int starting_entity_nb = 0;
 const int starting_entity_nb = 1;
 
-bool move_left = false;
-bool move_right = false;
-bool move_up = false;
-bool move_down = false;
+bool left_pushed = false;
+bool right_pushed = false;
+bool up_pushed = false;
+bool down_pushed = false;
+
+bool a_pushed = false;
+bool w_pushed = false;
+bool s_pushed = false;
+bool d_pushed = false;
 
 int mode = CONTACT_TREE_BALL_SPAWN; 
 // Area area(2,1);
@@ -118,17 +123,29 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_o:
       set_gravity(0, 0);
     break;
+    case SDLK_w:
+      w_pushed = false;
+    break;
+    case SDLK_a:
+      a_pushed = false;
+    break;
+    case SDLK_s:
+      s_pushed = false;
+    break;
+    case SDLK_d:
+      d_pushed = false;
+    break;
     case SDLK_UP:
-      move_up = false;
+      up_pushed = false;
     break;
     case SDLK_DOWN:
-      move_down = false;
+      down_pushed = false;
     break;
     case SDLK_LEFT:
-      move_left = false;
+      left_pushed = false;
     break;
     case SDLK_RIGHT:
-      move_right = false;
+      right_pushed = false;
     break;
   }
 }
@@ -137,28 +154,28 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
 void key_down(SDLKey sym, SDLMod mod, Uint16 unicode) { 
   switch(sym) {
     case SDLK_w:
-      camera.accel->ay = -0.2;
+      w_pushed = true;
     break;
     case SDLK_a:
-      camera.accel->ax = -0.2;
+      a_pushed = true;
     break;
     case SDLK_s:
-      camera.accel->ay = 0.2;
+      s_pushed = true;
     break;
     case SDLK_d:
-      camera.accel->ax = 0.2;
+      d_pushed = true;
     break;
     case SDLK_UP:
-      move_up = true;
+      up_pushed = true;
     break;
     case SDLK_DOWN:
-      move_down = true;
+      down_pushed = true;
     break;
     case SDLK_LEFT:
-      move_left = true;
+      left_pushed = true;
     break;
     case SDLK_RIGHT:
-      move_right = true;
+      right_pushed = true;
     break;
   }
 }
@@ -177,7 +194,7 @@ void init_camera() {
   //camera.mask->w = WWIDTH;
   //camera.mask->h = WHEIGHT;
   camera.flags = GHOST;
-  camera.accel->friction = 0;
+  camera.accel->friction = 1.0;
 }
 
 
@@ -644,18 +661,13 @@ void process_ephemerals() {
 
 
 void apply_player_moves() {
-  printf("frame start\n");
-  printf("move_left %d\n", move_left);
-  printf("move_right %d\n", move_right);
-  printf("move_up %d\n", move_up);
-  printf("canjump : %d\n", player->speed->can_jump);
-  if(move_left) {
+  if(left_pushed) {
     player->accel->ax = -5;
   }
-  if(move_right) {
+  if(right_pushed) {
     player->accel->ax = 5;
   }
-  if(move_up) {
+  if(up_pushed) {
     if(player->flags & CAN_JUMP) {
       if(player->speed->can_jump) {
         player->accel->ay = -15; 
@@ -665,11 +677,26 @@ void apply_player_moves() {
       player->accel->ay = -5;
     }
   }
-  if(move_down) {
+  if(down_pushed) {
     if(!(player->flags & CAN_JUMP))
       player->accel->ay = 5;
   }
-  printf("frame end\n");
+}
+
+
+void apply_camera_moves() {
+  if(a_pushed) {
+    camera.accel->ax = -5;
+  }
+  if(d_pushed) {
+    camera.accel->ax = 5;
+  }
+  if(w_pushed) {
+    camera.accel->ay = -5;
+  }
+  if(s_pushed) {
+    camera.accel->ay = 5;
+  }
 }
 
 
@@ -680,6 +707,7 @@ void loop() {
     apply_gravity();
     manage_inputs();
     apply_player_moves();
+    apply_camera_moves();
     cap_player_speed();
     update_positions();
     do_collisions();

@@ -88,10 +88,15 @@ extern const int speed_cap;
 
 extern const int starting_entity_nb;
 
-extern bool move_left;
-extern bool move_right;
-extern bool move_up;
-extern bool move_down;
+extern bool left_pushed;
+extern bool right_pushed;
+extern bool up_pushed;
+extern bool down_pushed;
+
+extern bool a_pushed;
+extern bool d_pushed;
+extern bool w_pushed;
+extern bool s_pushed;
 
 // for now, only one player controlled entity
 extern Entity* player;

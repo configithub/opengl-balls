@@ -642,15 +642,13 @@ void process_ephemerals() {
   }
 }
 
-void reset_moves() {
-  move_left = false;
-  move_right = false;
-  move_up = false;
-  move_down = false;
-}
-
 
 void apply_player_moves() {
+  printf("frame start\n");
+  printf("move_left %d\n", move_left);
+  printf("move_right %d\n", move_right);
+  printf("move_up %d\n", move_up);
+  printf("canjump : %d\n", player->speed->can_jump);
   if(move_left) {
     player->accel->ax = -5;
   }
@@ -658,15 +656,20 @@ void apply_player_moves() {
     player->accel->ax = 5;
   }
   if(move_up) {
-    if(player->flags & CAN_JUMP)
-      player->accel->ay = player->speed->can_jump ? -15 : player->accel->ay;
-    else
+    if(player->flags & CAN_JUMP) {
+      if(player->speed->can_jump) {
+        player->accel->ay = -15; 
+        player->speed->can_jump = false;
+      }
+    }else{
       player->accel->ay = -5;
+    }
   }
   if(move_down) {
     if(!(player->flags & CAN_JUMP))
       player->accel->ay = 5;
   }
+  printf("frame end\n");
 }
 
 
@@ -675,7 +678,6 @@ void loop() {
   while(running) { 
     clear_screen();
     apply_gravity();
-    reset_moves();
     manage_inputs();
     apply_player_moves();
     cap_player_speed();

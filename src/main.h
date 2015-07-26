@@ -74,8 +74,6 @@ void do_render();
 
 void process_ephemerals();
 
-void reset_moves();
-
 void apply_player_moves();
 
 void loop();

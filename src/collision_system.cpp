@@ -125,16 +125,15 @@ void speculative_contact(Entity& entity, const Area& area) {
     }
     speculative_y += step_y;
     if(!area.valid_map_position(speculative_x, speculative_y, entity)) {
+      if( (entity.flags & CAN_JUMP) && (entity.speed->vy > 0) ) { 
+        entity.speed->can_jump = true;  // TODO, signals ?
+      }
       entity.speed->vy = 0;
       entity.accel->ay = 0 ;
       speculative_y -= step_y;
       step_y = 0;
-      if(entity.flags & CAN_JUMP) { 
-        entity.speed->can_jump = true; 
-      }
     }else{
       dist_y -= step_y;
-      if(entity.flags & CAN_JUMP) { entity.speed->can_jump = false; }
     }
     if(dist_x == 0) { step_x = 0; }
     if(dist_y == 0) { step_y = 0; }

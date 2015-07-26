@@ -117,6 +117,7 @@ void speculative_contact(Entity& entity, const Area& area) {
     speculative_x += step_x;
     if(!area.valid_map_position(speculative_x, speculative_y, entity)) {
       entity.speed->vx = 0;
+      entity.accel->ax = 0 ;
       speculative_x -= step_x;
       step_x = 0;
     }else{
@@ -124,7 +125,11 @@ void speculative_contact(Entity& entity, const Area& area) {
     }
     speculative_y += step_y;
     if(!area.valid_map_position(speculative_x, speculative_y, entity)) {
+      if( (entity.flags & CAN_JUMP) && (entity.speed->vy > 0) ) { 
+        entity.speed->can_jump = true;  // TODO, signals ?
+      }
       entity.speed->vy = 0;
+      entity.accel->ay = 0 ;
       speculative_y -= step_y;
       step_y = 0;
     }else{
@@ -224,9 +229,11 @@ void resolve_collisions_for_one_rank(const std::vector<Collision*>& collisions) 
         if((*itCol)->entity->mask->down_rk < (*itCol)->other->mask->down_rk) {
           (*itCol)->other->position->sy += (*itCol)->cy;
           (*itCol)->other->speed->vy = 0;
+          (*itCol)->other->accel->ay = 0;
         }else if((*itCol)->entity->mask->down_rk > (*itCol)->other->mask->down_rk) {
           (*itCol)->entity->position->sy -= (*itCol)->cy;
           (*itCol)->entity->speed->vy = 0;
+          (*itCol)->entity->accel->ay = 0;
         }
       }else{
         (*itCol)->other->position->sx += (*itCol)->cx / 2;

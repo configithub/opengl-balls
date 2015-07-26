@@ -6,17 +6,22 @@ bool running;
 
 const int speed_factor = 4;
 const int size_factor = 20;
-const int speed_cap = 4;
+const int speed_cap = 5;
 
 bool tile_map_active = true;
 
 //const int starting_entity_nb = 0;
 const int starting_entity_nb = 1;
 
-bool move_left = false;
-bool move_right = false;
-bool move_up = false;
-bool move_down = false;
+bool left_pushed = false;
+bool right_pushed = false;
+bool up_pushed = false;
+bool down_pushed = false;
+
+bool a_pushed = false;
+bool w_pushed = false;
+bool s_pushed = false;
+bool d_pushed = false;
 
 int mode = CONTACT_TREE_BALL_SPAWN; 
 // Area area(2,1);
@@ -118,17 +123,29 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_o:
       set_gravity(0, 0);
     break;
+    case SDLK_w:
+      w_pushed = false;
+    break;
+    case SDLK_a:
+      a_pushed = false;
+    break;
+    case SDLK_s:
+      s_pushed = false;
+    break;
+    case SDLK_d:
+      d_pushed = false;
+    break;
     case SDLK_UP:
-      move_up = false;
+      up_pushed = false;
     break;
     case SDLK_DOWN:
-      move_down = false;
+      down_pushed = false;
     break;
     case SDLK_LEFT:
-      move_left = false;
+      left_pushed = false;
     break;
     case SDLK_RIGHT:
-      move_right = false;
+      right_pushed = false;
     break;
   }
 }
@@ -137,28 +154,28 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
 void key_down(SDLKey sym, SDLMod mod, Uint16 unicode) { 
   switch(sym) {
     case SDLK_w:
-      camera.accel->ay = -0.2;
+      w_pushed = true;
     break;
     case SDLK_a:
-      camera.accel->ax = -0.2;
+      a_pushed = true;
     break;
     case SDLK_s:
-      camera.accel->ay = 0.2;
+      s_pushed = true;
     break;
     case SDLK_d:
-      camera.accel->ax = 0.2;
+      d_pushed = true;
     break;
     case SDLK_UP:
-      move_up = true;
+      up_pushed = true;
     break;
     case SDLK_DOWN:
-      move_down = true;
+      down_pushed = true;
     break;
     case SDLK_LEFT:
-      move_left = true;
+      left_pushed = true;
     break;
     case SDLK_RIGHT:
-      move_right = true;
+      right_pushed = true;
     break;
   }
 }
@@ -177,7 +194,7 @@ void init_camera() {
   //camera.mask->w = WWIDTH;
   //camera.mask->h = WHEIGHT;
   camera.flags = GHOST;
-  camera.accel->friction = 1;
+  camera.accel->friction = 1.0;
 }
 
 
@@ -402,7 +419,6 @@ void add_contact_tree_ball() {
 void init_player() {
   Entity& player_entity = entity_factory.create();
   player = &player_entity;
-  //player->id = 999;
   player->position = position_factory.create();
   player->speed = speed_factory.create();
   player->shape = shape_factory.create();
@@ -416,8 +432,8 @@ void init_player() {
   player->shape->h = 2*size_factor;
   player->mask->w = size_factor;
   player->mask->h = 2*size_factor;
-  // player->flags = SPECULATIVE_COLLIDE | CONTACT_TREE | PLAYER;
-  player->flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE | PLAYER;
+  player->flags = GRAVITY_BOUND | SPECULATIVE_COLLIDE | CONTACT_TREE 
+                  | PLAYER | CAN_JUMP;
   player->accel->friction = 1;
 }
 
@@ -515,7 +531,6 @@ void init_tile_map() {
 void load_tile_map() {
   area = Area();
   area.load_from_tmx("data/tileset/basic.tmx");
-  //area.load_from_tmx("../data/tileset/basic.tmx");
   tile_map_active = true;
 }
 
@@ -587,9 +602,11 @@ void apply_gravity() {
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     if(entity.accel == NULL) { continue; }
-    entity.accel->ax = entity.flags & GRAVITY_BOUND ? gravity.ax : 0;
-    entity.accel->ay = entity.flags & GRAVITY_BOUND ? gravity.ay : 0;
+    entity.speed->vx = entity.flags & GRAVITY_BOUND ? entity.speed->vx+gravity.ax : 0;
+    entity.speed->vy = entity.flags & GRAVITY_BOUND ? entity.speed->vy+gravity.ay : 0;
   }
+  player->speed->vx = player->flags & GRAVITY_BOUND ? player->speed->vx+gravity.ax : 0;
+  player->speed->vy = player->flags & GRAVITY_BOUND ? player->speed->vy+gravity.ay : 0;
 }
 
 
@@ -603,7 +620,7 @@ void cap_all_entities_speeds() {
     Entity& entity = entity_factory.objs[i];
     cap_speed(entity, speed_cap);
   }
-  // cap_player_speed();
+  cap_player_speed();
 }
 
 
@@ -642,26 +659,43 @@ void process_ephemerals() {
   }
 }
 
-void reset_moves() {
-  move_left = false;
-  move_right = false;
-  move_up = false;
-  move_down = false;
+
+void apply_player_moves() {
+  if(left_pushed) {
+    player->accel->ax = -5;
+  }
+  if(right_pushed) {
+    player->accel->ax = 5;
+  }
+  if(up_pushed) {
+    if(player->flags & CAN_JUMP) {
+      if(player->speed->can_jump) {
+        player->accel->ay = -15; 
+        player->speed->can_jump = false;
+      }
+    }else{
+      player->accel->ay = -5;
+    }
+  }
+  if(down_pushed) {
+    if(!(player->flags & CAN_JUMP))
+      player->accel->ay = 5;
+  }
 }
 
 
-void apply_player_moves() {
-  if(move_left) {
-    player->accel->ax = -5;
+void apply_camera_moves() {
+  if(a_pushed) {
+    camera.accel->ax = -5;
   }
-  if(move_right) {
-    player->accel->ax = 5;
+  if(d_pushed) {
+    camera.accel->ax = 5;
   }
-  if(move_up) {
-    player->accel->ay = -5;
+  if(w_pushed) {
+    camera.accel->ay = -5;
   }
-  if(move_down) {
-    player->accel->ay = 5;
+  if(s_pushed) {
+    camera.accel->ay = 5;
   }
 }
 
@@ -671,9 +705,9 @@ void loop() {
   while(running) { 
     clear_screen();
     apply_gravity();
-    //reset_moves();
     manage_inputs();
     apply_player_moves();
+    apply_camera_moves();
     cap_player_speed();
     update_positions();
     do_collisions();
@@ -689,7 +723,7 @@ int main(int argc, char** argv) {
   init_camera();
   init_entities();
   init_player();
-  //init_tile_map();
+  init_tile_map();
   load_tile_map();
   set_gravity(0, 2);
   printf("starting pong\n"); 

@@ -12,8 +12,11 @@ void update_position_ghost(Entity& entity) {
   Speed& speed = *(entity.speed);
   Accel& accel = *(entity.accel);
   pos.sx = pos.x; pos.sy = pos.y;
-  speed.vx += accel.ax - sgn(speed.vx)*accel.friction;
-  speed.vy += accel.ay - sgn(speed.vy)*accel.friction;
+  speed.vx += accel.ax - fsgn(speed.vx)*accel.friction;
+  speed.vy += accel.ay - fsgn(speed.vy)*accel.friction;
+  // apply friction
+  accel.ax -= fsgn(accel.ax)*accel.friction;
+  accel.ay -= fsgn(accel.ay)*accel.friction;
   pos.sx += speed.vx;
   pos.sy += speed.vy;
   // do realize motion now, as there is no collision anyway
@@ -62,8 +65,15 @@ void update_position_inertial(Entity& entity) {
   Speed& speed = *(entity.speed);
   Accel& accel = *(entity.accel);
   AABB& mask = *(entity.mask);
+  // apply acceleration
   speed.vx += accel.ax - sgn(speed.vx)*accel.friction;
-  speed.vy += accel.ay - sgn(speed.vy)*accel.friction;
+  speed.vy += accel.ay;  // TODO, different friction value here?
+  // apply friction
+  accel.ax -= fsgn(accel.ax)*accel.friction;
+  accel.ay -= fsgn(accel.ay)*accel.friction;
+  // stop if speed below threshold
+  speed.vx = fabs(speed.vx) <= accel.friction ? 0 : speed.vx;
+  speed.vy = fabs(speed.vy) <= accel.friction ? 0 : speed.vy;
   // update speculative position
   pos.sx = pos.x; pos.sy = pos.y;
   pos.sx += speed.vx;
@@ -85,8 +95,9 @@ void update_position_inertial(Entity& entity) {
 
 void cap_speed(Entity& entity, const int& cap) {
   Speed& speed = *(entity.speed);
-  speed.vx = fabs(speed.vx) > cap ? sgn(speed.vx)*cap : speed.vx;
-  speed.vy = fabs(speed.vy) > cap ? sgn(speed.vy)*cap : speed.vy;
+  // TODO, different caps for horizontal and vertical motion
+  speed.vx = fabs(speed.vx) > cap ? fsgn(speed.vx)*cap : speed.vx;
+  speed.vy = fabs(speed.vy) > 2*cap ? fsgn(speed.vy)*2*cap : speed.vy;
 }
 
 

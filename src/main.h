@@ -76,6 +76,8 @@ void process_ephemerals();
 
 void apply_player_moves();
 
+void apply_camera_moves();
+
 void loop();
 
 int main(int argc, char** argv);

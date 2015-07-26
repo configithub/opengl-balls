@@ -227,10 +227,16 @@ void resolve_collisions_for_one_rank(const std::vector<Collision*>& collisions) 
       itCol != collisions.end(); ++itCol) { 
       if(fabs((*itCol)->cx) > fabs((*itCol)->cy)) {
         if((*itCol)->entity->mask->down_rk < (*itCol)->other->mask->down_rk) {
+          if( ((*itCol)->other->flags & CAN_JUMP) && ((*itCol)->other->speed->vy > 0) ) { 
+            (*itCol)->other->speed->can_jump = true;  // TODO, signals ?
+          }
           (*itCol)->other->position->sy += (*itCol)->cy;
           (*itCol)->other->speed->vy = 0;
           (*itCol)->other->accel->ay = 0;
         }else if((*itCol)->entity->mask->down_rk > (*itCol)->other->mask->down_rk) {
+          if( ((*itCol)->entity->flags & CAN_JUMP) && ((*itCol)->entity->speed->vy > 0) ) { 
+            (*itCol)->entity->speed->can_jump = true;  // TODO, signals ?
+          }
           (*itCol)->entity->position->sy -= (*itCol)->cy;
           (*itCol)->entity->speed->vy = 0;
           (*itCol)->entity->accel->ay = 0;

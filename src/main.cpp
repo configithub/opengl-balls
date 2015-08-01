@@ -531,6 +531,7 @@ void init_tile_map() {
 void load_tile_map() {
   area = Area();
   area.load_from_tmx("data/tileset/basic.tmx");
+  // area.load_from_tmx("data/tileset/basic2.tmx");
   tile_map_active = true;
 }
 

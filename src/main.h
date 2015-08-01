@@ -76,7 +76,10 @@ void process_ephemerals();
 
 void apply_player_moves();
 
+// update camera position via wasd keys
 void apply_camera_moves();
+
+void camera_follows_player();
 
 void loop();
 

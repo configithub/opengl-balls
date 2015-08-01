@@ -133,6 +133,7 @@ void speculative_contact(Entity& entity, const Area& area) {
       speculative_y -= step_y;
       step_y = 0;
     }else{
+      entity.speed->can_jump = false;  
       dist_y -= step_y;
     }
     if(dist_x == 0) { step_x = 0; }

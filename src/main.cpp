@@ -1,5 +1,6 @@
 #include "main.h"
 #include "collision_system.h"
+#include <iostream>
 
 SDL_Event events;
 bool running;
@@ -135,17 +136,17 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_d:
       d_pushed = false;
     break;
-    case SDLK_UP:
-      up_pushed = false;
-    break;
-    case SDLK_DOWN:
-      down_pushed = false;
-    break;
     case SDLK_LEFT:
       left_pushed = false;
     break;
     case SDLK_RIGHT:
       right_pushed = false;
+    break;
+    case SDLK_DOWN:
+      down_pushed = false;
+    break;
+    case SDLK_UP:
+      up_pushed = false;
     break;
   }
 }
@@ -165,17 +166,17 @@ void key_down(SDLKey sym, SDLMod mod, Uint16 unicode) {
     case SDLK_d:
       d_pushed = true;
     break;
-    case SDLK_UP:
-      up_pushed = true;
-    break;
-    case SDLK_DOWN:
-      down_pushed = true;
-    break;
     case SDLK_LEFT:
       left_pushed = true;
     break;
     case SDLK_RIGHT:
       right_pushed = true;
+    break;
+    case SDLK_DOWN:
+      down_pushed = true;
+    break;
+    case SDLK_UP:
+      up_pushed = true;
     break;
   }
 }

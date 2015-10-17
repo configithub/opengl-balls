@@ -114,6 +114,19 @@ void speculative_contact(Entity& entity, const Area& area) {
   int dist_x = entity.position->sx - entity.position->x;
   int dist_y = entity.position->sy - entity.position->y;
   while(true) {
+    speculative_y += step_y;
+    if(!area.valid_map_position(speculative_x, speculative_y, entity)) {
+      if( (entity.flags & CAN_JUMP) && (entity.speed->vy >= 0) ) { 
+        entity.speed->can_jump = true;  // TODO, signals ?
+      }
+      entity.speed->vy = 0;
+      entity.accel->ay = 0 ;
+      speculative_y -= step_y;
+      step_y = 0;
+    }else{
+      if(step_y > 0) { entity.speed->can_jump = false; } 
+      dist_y -= step_y;
+    }
     speculative_x += step_x;
     if(!area.valid_map_position(speculative_x, speculative_y, entity)) {
       entity.speed->vx = 0;
@@ -122,19 +135,6 @@ void speculative_contact(Entity& entity, const Area& area) {
       step_x = 0;
     }else{
       dist_x -= step_x;
-    }
-    speculative_y += step_y;
-    if(!area.valid_map_position(speculative_x, speculative_y, entity)) {
-      if( (entity.flags & CAN_JUMP) && (entity.speed->vy > 0) ) { 
-        entity.speed->can_jump = true;  // TODO, signals ?
-      }
-      entity.speed->vy = 0;
-      entity.accel->ay = 0 ;
-      speculative_y -= step_y;
-      step_y = 0;
-    }else{
-      entity.speed->can_jump = false;  
-      dist_y -= step_y;
     }
     if(dist_x == 0) { step_x = 0; }
     if(dist_y == 0) { step_y = 0; }

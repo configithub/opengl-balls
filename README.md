@@ -3,6 +3,9 @@ opengl-balls
 
 simple stuff based on opengl+sdl, contains a very simple entity component system
 
+[![opengl balls](http://img.youtube.com/vi/9qFXidEn7So/0.jpg)](http://www.youtube.com/watch?v=9qFXidEn7So)
+
+
 mkdir bin
 
 make

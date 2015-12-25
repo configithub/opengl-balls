@@ -607,12 +607,15 @@ void apply_gravity() {
     entity.speed->vx = entity.flags & GRAVITY_BOUND ? entity.speed->vx+gravity.ax : 0;
     entity.speed->vy = entity.flags & GRAVITY_BOUND ? entity.speed->vy+gravity.ay : 0;
   }
-  player->speed->vx = player->flags & GRAVITY_BOUND ? player->speed->vx+gravity.ax : 0;
-  player->speed->vy = player->flags & GRAVITY_BOUND ? player->speed->vy+gravity.ay : 0;
+  if(!(player->flags & DEAD)) {
+    player->speed->vx = player->flags & GRAVITY_BOUND ? player->speed->vx+gravity.ax : 0;
+    player->speed->vy = player->flags & GRAVITY_BOUND ? player->speed->vy+gravity.ay : 0;
+  }
 }
 
 
 void cap_player_speed() {
+  if(player->flags & DEAD) { return; }
   cap_speed(*player, speed_cap);
 }
 
@@ -622,7 +625,9 @@ void cap_all_entities_speeds() {
     Entity& entity = entity_factory.objs[i];
     cap_speed(entity, speed_cap);
   }
-  cap_player_speed();
+  if(!(player->flags & DEAD)) {
+    cap_player_speed();
+  }
 }
 
 
@@ -663,6 +668,9 @@ void process_ephemerals() {
 
 
 void apply_player_moves() {
+  if(player->flags & DEAD) {
+    return;
+  }
   if(left_pushed) {
     player->accel->ax = -5;
   }

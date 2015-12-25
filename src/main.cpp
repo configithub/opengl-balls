@@ -104,6 +104,7 @@ void key_up(SDLKey sym, SDLMod mod, Uint16 unicode) {
         clear_tile_map();
       }else{
         set_square_tile_map();
+        //init_tile_map();
       }
     break;
     case SDLK_u:
@@ -187,13 +188,10 @@ void init_camera() {
   camera.speed = speed_factory.create();
   camera.accel = accel_factory.create();
   camera.shape = shape_factory.create();
-  //camera.mask = mask_factory.create();
   camera.position->x = 0;
   camera.position->y = 0;
   camera.shape->w = WWIDTH;
   camera.shape->h = WHEIGHT;
-  //camera.mask->w = WWIDTH;
-  //camera.mask->h = WHEIGHT;
   camera.flags = GHOST;
   camera.accel->friction = 1.0;
 }
@@ -241,8 +239,8 @@ void add_hard_ball() {
   entity.speed = speed_factory.create();
   entity.shape = shape_factory.create();
   entity.mask = mask_factory.create();
-  entity.position->x = 0;
-  entity.position->y = 0;
+  entity.position->x = 1;
+  entity.position->y = 1;
   entity.speed->vx = speed_factor;
   entity.speed->vy = speed_factor;
   entity.shape->w = size_factor;
@@ -405,7 +403,7 @@ void add_contact_tree_ball() {
   entity.mask = mask_factory.create();
   entity.accel = accel_factory.create();
   entity.position->x = WWIDTH / 2;
-  entity.position->y = WHEIGHT / 2;
+  entity.position->y = 2*WHEIGHT / 3;
   entity.speed->vx = 0;
   entity.speed->vy = 0;
   entity.shape->w = size_factor;
@@ -501,6 +499,7 @@ void init_tile_map() {
   int width = WWIDTH / tile_size;
   int height = WHEIGHT / tile_size;
   int half_tile = tile_size / 2;
+  area.width =1; area.height =1;
   for(int k = 0; k < area.width*area.height; ++k) {
     Map tm;
     tm.tiles.reserve(height*width);
@@ -512,14 +511,14 @@ void init_tile_map() {
         tile.position = tposition_factory.create();       
         tile.position->x = ((k%area.width)*width+i)*tile_size+half_tile;
         tile.position->y = ((k/area.width)*height+j)*tile_size+half_tile;
-        if(tile.flags == SOLID) { 
+        //if(tile.flags == SOLID) { 
           tile.shape = tshape_factory.create();       
           tile.mask = tmask_factory.create();       
           tile.shape->w = tile_size;
           tile.shape->h = tile_size;
           tile.mask->w = tile_size;
           tile.mask->h = tile_size;
-        }
+        //}
         tm.tiles.push_back(tile);
       }
     } 
@@ -557,12 +556,15 @@ void set_square_tile_map() {
   printf("setting tilemap\n");
   int width = WWIDTH / tile_size;
   int height = WHEIGHT / tile_size;
+  area.width =1; area.height =1;
   for(int k = 0; k < area.width*area.height; ++k) {
+    area.tilemaps[k].texture->loaded = false;
     for(int j = 0; j < height; ++j) {
       for(int i = 0; i < width; ++i) {
         Tile& tile = area.tilemaps[k].tiles[width*j+i];
         tile.flags = (j==0 || j==screen_height-1
                    || i==0 || i==screen_width-1) ? SOLID : VOID;
+        tile.tileset_part = -1;
       }
     } 
   }
@@ -597,6 +599,7 @@ void clear_all() {
     Entity& entity = entity_factory.objs[i];
     entity_factory.remove(entity);
   }
+  player = NULL;
 }
 
 
@@ -607,14 +610,17 @@ void apply_gravity() {
     entity.speed->vx = entity.flags & GRAVITY_BOUND ? entity.speed->vx+gravity.ax : 0;
     entity.speed->vy = entity.flags & GRAVITY_BOUND ? entity.speed->vy+gravity.ay : 0;
   }
-  if(!(player->flags & DEAD)) {
-    player->speed->vx = player->flags & GRAVITY_BOUND ? player->speed->vx+gravity.ax : 0;
-    player->speed->vy = player->flags & GRAVITY_BOUND ? player->speed->vy+gravity.ay : 0;
+  if(player != NULL) { 
+    if(!(player->flags & DEAD)) {
+      player->speed->vx = player->flags & GRAVITY_BOUND ? player->speed->vx+gravity.ax : 0;
+      player->speed->vy = player->flags & GRAVITY_BOUND ? player->speed->vy+gravity.ay : 0;
+    }
   }
 }
 
 
 void cap_player_speed() {
+  if(player == NULL) { return; }
   if(player->flags & DEAD) { return; }
   cap_speed(*player, speed_cap);
 }
@@ -625,6 +631,7 @@ void cap_all_entities_speeds() {
     Entity& entity = entity_factory.objs[i];
     cap_speed(entity, speed_cap);
   }
+  if(player == NULL) { return; }
   if(!(player->flags & DEAD)) {
     cap_player_speed();
   }
@@ -647,7 +654,9 @@ void do_collisions() {
 
 
 void do_render() {
-  area.render(camera); 
+  if(tile_map_active) {
+    area.render(camera); 
+  }
   for (int i = 0; i < entity_factory.nb_obj; ++i) {
     Entity& entity = entity_factory.objs[i];
     render_rotated(entity, camera);
@@ -668,6 +677,7 @@ void process_ephemerals() {
 
 
 void apply_player_moves() {
+  if(player == NULL) { return; }
   if(player->flags & DEAD) {
     return;
   }

@@ -39,6 +39,9 @@ void check_collision(Entity& entity,
     }else{ // collision happens
       if((entity.flags & CONTACT_TREE) && (other.flags & CONTACT_TREE)) {
         do_collision_speculative_tree(entity, other, collisions);
+      }else if((entity.flags & SPECULATIVE_COLLIDE) 
+          && (other.flags & SPECULATIVE_COLLIDE)){
+        do_collision_speculative(entity, other);
       }else{
         do_collision_speculative(entity, other);
       }

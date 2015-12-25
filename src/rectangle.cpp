@@ -28,6 +28,7 @@ void render_tile(Tile& tile, const Entity& camera) {
   if ( tile.position == NULL 
     || tile.shape == NULL
     || tile.flags == VOID) { return; }
+  //std::cout << "render bw tile" << std::endl;
   Position& pos = *(tile.position);
   Rectangle& rect = *(tile.shape);
   int w = rect.w/2; int h = rect.h/2;
@@ -41,6 +42,10 @@ void render_tile(Tile& tile, const Entity& camera) {
 void render_tile_textured(const Texture& t, Tile& tile, const Entity& camera) {
   if ( tile.position == NULL 
     || tile.shape == NULL) { return; }
+  if(!t.loaded) {
+    render_tile(tile, camera);
+    return;
+  }
   Position& pos = *(tile.position);
   Rectangle& rect = *(tile.shape);
   int w = rect.w/2; int h = rect.h/2;

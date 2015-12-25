@@ -21,7 +21,7 @@ public:
   int sx;
   int sy;
   float theta;
-  Position(): x(0), y(0), theta(0.0) {}
+  Position(): x(0), y(0), sx(0), sy(0), theta(0.0) {}
 };
 
 

@@ -82,11 +82,13 @@ void draw_hollow_square(int x1, int y1, int x2, int y2,
 
 void draw_square(int x1, int y1, int x2, int y2, 
                  int x3, int y3, int x4, int y4) {
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   GLfloat vertices[] = {x1,y1, x2,y2, x3,y3, x4,y4};
   glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(2, GL_FLOAT, 0, vertices);
   glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
   glDisableClientState(GL_VERTEX_ARRAY);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 
@@ -131,6 +133,7 @@ void load_png(const char* name) {
 
   // keep a ref on this in the texture map
   Texture t;
+  t.loaded = true;
   t.w = pic->w; t.h = pic->h;
   t.id = currentTexture;
   std::string name_str(name);
@@ -168,6 +171,9 @@ void draw_rectangle_texture(const Texture& t , int x, int y,
   glDrawArrays(GL_TRIANGLE_FAN, 0, 4); 
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  glDisable(GL_TEXTURE_2D);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glBindTexture(GL_TEXTURE_2D,0);
 }
 
 

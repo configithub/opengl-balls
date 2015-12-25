@@ -11,8 +11,10 @@
 
 class Texture {
 public:
+  Texture() { loaded = false; }
   int w,h;
   int id; // glid
+  bool loaded;
 };
 
 // hold all textures
